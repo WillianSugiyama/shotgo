@@ -6,10 +6,10 @@ import "time"
 type RecordingState string
 
 const (
-	RecordingIdle     RecordingState = "idle"
-	RecordingActive   RecordingState = "recording"
-	RecordingPaused   RecordingState = "paused"
-	RecordingStopped  RecordingState = "stopped"
+	RecordingIdle    RecordingState = "idle"
+	RecordingActive  RecordingState = "recording"
+	RecordingPaused  RecordingState = "paused"
+	RecordingStopped RecordingState = "stopped"
 )
 
 // OutputFormat represents the recording output format.

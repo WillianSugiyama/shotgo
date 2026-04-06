@@ -43,7 +43,7 @@ func (c *DarwinCapturer) ListWindows() ([]port.WindowInfo, error) {
 
 func (c *DarwinCapturer) runScreencapture(source entity.CaptureSource, region *entity.Region) (*entity.Screenshot, error) {
 	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("shotgo-%d.png", time.Now().UnixNano()))
-	defer os.Remove(tmpFile)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	args := []string{"-x", "-t", "png", tmpFile}
 	cmd := exec.Command("screencapture", args...)
@@ -55,7 +55,7 @@ func (c *DarwinCapturer) runScreencapture(source entity.CaptureSource, region *e
 	if err != nil {
 		return nil, fmt.Errorf("open screenshot: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	img, err := png.Decode(f)
 	if err != nil {

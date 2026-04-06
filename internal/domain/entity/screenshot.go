@@ -27,6 +27,6 @@ type Screenshot struct {
 	Height    int           `json:"height"`
 	Format    ImageFormat   `json:"format"`
 	Source    CaptureSource `json:"source"`
-	Region   *Region       `json:"region,omitempty"`
-	CreatedAt time.Time    `json:"createdAt"`
+	Region    *Region       `json:"region,omitempty"`
+	CreatedAt time.Time     `json:"createdAt"`
 }

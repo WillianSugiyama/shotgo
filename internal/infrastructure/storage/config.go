@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	appDirName  = "ShotGo"
-	configFile  = "config.json"
+	appDirName = "ShotGo"
+	configFile = "config.json"
 )
 
 // JSONConfigStore reads and writes AppConfig as JSON in the OS config directory.

@@ -44,13 +44,13 @@ func (fs *LocalFileStorage) SaveRecording(rec *entity.Recording, path string) er
 	if err != nil {
 		return fmt.Errorf("open recording source: %w", err)
 	}
-	defer src.Close()
+	defer func() { _ = src.Close() }()
 
 	dst, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("create recording dest: %w", err)
 	}
-	defer dst.Close()
+	defer func() { _ = dst.Close() }()
 
 	if _, err := io.Copy(dst, src); err != nil {
 		return fmt.Errorf("copy recording: %w", err)

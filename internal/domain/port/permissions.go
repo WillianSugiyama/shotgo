@@ -4,8 +4,8 @@ package port
 type PermissionStatus string
 
 const (
-	PermissionGranted     PermissionStatus = "granted"
-	PermissionDenied      PermissionStatus = "denied"
+	PermissionGranted      PermissionStatus = "granted"
+	PermissionDenied       PermissionStatus = "denied"
 	PermissionUndetermined PermissionStatus = "undetermined"
 )
 
