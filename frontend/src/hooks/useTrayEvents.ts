@@ -14,6 +14,7 @@ export function useTrayEvents() {
   const { setView } = useAppStore();
 
   useEffect(() => {
+    if (!window.runtime) return;
     const unsubscribe = EventsOn("tray:action", (action: string) => {
       switch (action) {
         case "capture-fullscreen":

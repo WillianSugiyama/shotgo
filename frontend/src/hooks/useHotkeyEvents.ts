@@ -12,6 +12,7 @@ export function useHotkeyEvents() {
   const { start: startRecording, stop: stopRecording } = useRecording();
 
   useEffect(() => {
+    if (!window.runtime) return;
     const cancel = EventsOn("hotkey:action", (action: string) => {
       switch (action) {
         case "capture_fullscreen":
