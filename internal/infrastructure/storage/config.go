@@ -51,6 +51,9 @@ func (s *JSONConfigStore) Load() (*port.AppConfig, error) {
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("parse config: %w", err)
 	}
+	if len(cfg.Hotkeys.Bindings) == 0 {
+		cfg.Hotkeys = DefaultHotkeys()
+	}
 	return &cfg, nil
 }
 
