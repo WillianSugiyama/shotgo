@@ -26,13 +26,42 @@ jobs:
         run: bash scripts/download-ffmpeg.sh darwin
       - name: Prepare ffmpeg embed
         run: bash scripts/prepare-ffmpeg-embed.sh darwin
-      - name: Build universal binary
+      - name: Build
         run: wails build -platform darwin/universal -tags embedffmpeg
+      - name: Import certificate
+        env:
+          CERT_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$CERT_BASE64" | base64 --decode > /tmp/cert.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import /tmp/cert.p12 -k build.keychain \
+            -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: \
+            -s -k "" build.keychain
+          rm /tmp/cert.p12
+      - name: Sign app
+        run: |
+          codesign --deep --force --verify --verbose \
+            --sign "Developer ID Application: Willian Sugiyama (GHSUN7X4H6)" \
+            --options runtime build/bin/ShotGo.app
       - name: Create DMG
         run: |
           hdiutil create -volname "ShotGo" \
             -srcfolder build/bin/ShotGo.app \
             -ov -format UDZO "build/bin/ShotGo-macOS-universal.dmg"
+      - name: Notarize
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit "build/bin/ShotGo-macOS-universal.dmg" \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" --wait
+          xcrun stapler staple "build/bin/ShotGo-macOS-universal.dmg"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -59,10 +88,11 @@ jobs:
       - name: Prepare ffmpeg embed
         run: bash scripts/prepare-ffmpeg-embed.sh windows
         shell: bash
-      - name: Build amd64
+      - name: Build
         run: wails build -platform windows/amd64 -tags embedffmpeg
       - name: Rename
-        run: Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-x64.exe"
+        run: |
+          Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-x64.exe"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -89,10 +119,11 @@ jobs:
       - name: Prepare ffmpeg embed
         run: bash scripts/prepare-ffmpeg-embed.sh windows
         shell: bash
-      - name: Build arm64
+      - name: Build
         run: wails build -platform windows/arm64 -tags embedffmpeg
       - name: Rename
-        run: Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-arm64.exe"
+        run: |
+          Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-arm64.exe"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
