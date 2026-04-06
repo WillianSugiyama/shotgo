@@ -25,6 +25,7 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 18, G: 18, B: 24, A: 1},
+		StartHidden:      true,
 		OnStartup:        application.Startup,
 		OnShutdown:       application.Shutdown,
 		Menu:             application.CreateMenu(),

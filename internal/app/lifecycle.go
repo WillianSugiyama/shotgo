@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
@@ -16,12 +15,6 @@ func (a *App) Startup(ctx context.Context) {
 	globalApp = a
 
 	setupNativeTray()
-
-	// Hide window after Wails finishes initializing
-	go func() {
-		time.Sleep(500 * time.Millisecond)
-		runtime.WindowHide(a.ctx)
-	}()
 
 	cfg, err := a.loadConfig.Execute()
 	if err != nil {

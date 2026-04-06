@@ -1,6 +1,8 @@
 package app
 
 import (
+	"log"
+
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -11,6 +13,13 @@ func (a *App) emitAction(action string) {
 	if a.ctx != nil {
 		wailsRuntime.EventsEmit(a.ctx, "tray:action", action)
 	}
+}
+
+func (a *App) showWindow() {
+	if a.ctx == nil {
+		return
+	}
+	wailsRuntime.WindowShow(a.ctx)
 }
 
 var trayActions = map[int]string{
@@ -29,10 +38,13 @@ func handleTrayAction(tag int) {
 	if !ok {
 		return
 	}
-	if action == "quit" {
+	log.Printf("[shotgo] tray action: %s", action)
+
+	switch action {
+	case "quit":
 		wailsRuntime.Quit(globalApp.ctx)
-		return
+	default:
+		globalApp.showWindow()
+		globalApp.emitAction(action)
 	}
-	wailsRuntime.WindowShow(globalApp.ctx)
-	globalApp.emitAction(action)
 }
