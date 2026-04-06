@@ -4,8 +4,11 @@ package recorder
 
 import (
 	"os/exec"
+	"regexp"
 	"strings"
 )
+
+var deviceIndexRe = regexp.MustCompile(`\[(\d+)\]\s+Capture screen`)
 
 // findScreenIndex detects the avfoundation index for "Capture screen 0".
 func findScreenIndex(ffmpegPath string) string {
@@ -13,13 +16,8 @@ func findScreenIndex(ffmpegPath string) string {
 		"-f", "avfoundation", "-list_devices", "true", "-i", "").
 		CombinedOutput()
 	for _, line := range strings.Split(string(out), "\n") {
-		if strings.Contains(line, "Capture screen 0") {
-			parts := strings.Split(line, "[")
-			for _, p := range parts {
-				if idx := strings.Index(p, "]"); idx > 0 {
-					return strings.TrimSpace(p[:idx])
-				}
-			}
+		if m := deviceIndexRe.FindStringSubmatch(line); len(m) > 1 {
+			return m[1]
 		}
 	}
 	return "0"
