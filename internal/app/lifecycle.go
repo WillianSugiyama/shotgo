@@ -12,6 +12,9 @@ import (
 // Startup is called when the Wails app starts.
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+	globalApp = a
+
+	setupNativeTray()
 
 	cfg, err := a.loadConfig.Execute()
 	if err != nil {
@@ -20,10 +23,6 @@ func (a *App) Startup(ctx context.Context) {
 	}
 
 	log.Printf("[shotgo] loaded %d hotkey bindings", len(cfg.Hotkeys.Bindings))
-	for _, b := range cfg.Hotkeys.Bindings {
-		log.Printf("[shotgo]   %s -> %v + %s", b.Action, b.Combo.Modifiers, b.Combo.Key)
-	}
-
 	if len(cfg.Hotkeys.Bindings) == 0 {
 		return
 	}
@@ -35,12 +34,13 @@ func (a *App) Startup(ctx context.Context) {
 	if err != nil {
 		log.Printf("[shotgo] hotkey register FAILED: %v", err)
 	} else {
-		log.Printf("[shotgo] hotkeys registered successfully")
+		log.Printf("[shotgo] hotkeys registered OK")
 	}
 }
 
 // Shutdown is called when the Wails app is closing.
 func (a *App) Shutdown(_ context.Context) {
+	removeNativeTray()
 	if a.hotkeyMgr != nil {
 		_ = a.hotkeyMgr.Unregister()
 	}
