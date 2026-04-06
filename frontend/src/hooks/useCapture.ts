@@ -12,7 +12,7 @@ export function useCapture() {
     setCapturing(true);
     try {
       const result = await CaptureFullscreen();
-      setImageData(result.id);
+      setImageData(result.imageBase64);
       setView("editor");
     } catch (err) {
       console.error("Fullscreen capture failed:", err);
@@ -26,7 +26,7 @@ export function useCapture() {
       setCapturing(true);
       try {
         const result = await CaptureRegion(region.x, region.y, region.width, region.height);
-        setImageData(result.id);
+        setImageData(result.imageBase64);
         setView("editor");
       } catch (err) {
         console.error("Region capture failed:", err);

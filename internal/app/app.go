@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"shotgo/internal/domain/entity"
 	"shotgo/internal/usecase"
 )
 
@@ -10,6 +11,9 @@ import (
 // It wires use cases to frontend bindings.
 type App struct {
 	ctx context.Context
+
+	// Last captured screenshot (held for save/copy operations)
+	lastScreenshot *entity.Screenshot
 
 	// Use cases
 	captureFullscreen *usecase.CaptureFullscreen

@@ -23,35 +23,48 @@ func NewDarwinCapturer() *DarwinCapturer {
 }
 
 func (c *DarwinCapturer) CaptureFullscreen() (*entity.Screenshot, error) {
-	return c.runScreencapture(entity.SourceFullscreen, nil)
+	return c.capture(entity.SourceFullscreen, nil)
 }
 
 func (c *DarwinCapturer) CaptureRegion(region entity.Region) (*entity.Screenshot, error) {
-	// TODO: pass -R x,y,w,h to screencapture for region selection
-	return c.runScreencapture(entity.SourceRegion, &region)
+	return c.capture(entity.SourceRegion, &region)
 }
 
 func (c *DarwinCapturer) CaptureWindow(windowID string) (*entity.Screenshot, error) {
-	// TODO: use -l <windowID> flag for window capture
-	return nil, fmt.Errorf("CaptureWindow not yet implemented for darwin")
+	return nil, fmt.Errorf("CaptureWindow not yet implemented")
 }
 
 func (c *DarwinCapturer) ListWindows() ([]port.WindowInfo, error) {
-	// TODO: use CGWindowListCopyWindowInfo via CGo or osascript
-	return nil, fmt.Errorf("ListWindows not yet implemented for darwin")
+	return nil, fmt.Errorf("ListWindows not yet implemented")
 }
 
-func (c *DarwinCapturer) runScreencapture(source entity.CaptureSource, region *entity.Region) (*entity.Screenshot, error) {
-	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("shotgo-%d.png", time.Now().UnixNano()))
-	defer func() { _ = os.Remove(tmpFile) }()
+func (c *DarwinCapturer) capture(
+	source entity.CaptureSource, region *entity.Region,
+) (*entity.Screenshot, error) {
+	tmp := filepath.Join(os.TempDir(), fmt.Sprintf("shotgo-%d.png", time.Now().UnixNano()))
+	defer func() { _ = os.Remove(tmp) }()
 
-	args := []string{"-x", "-t", "png", tmpFile}
-	cmd := exec.Command("screencapture", args...)
-	if err := cmd.Run(); err != nil {
+	args := buildArgs(tmp, region)
+	if err := exec.Command("screencapture", args...).Run(); err != nil {
 		return nil, fmt.Errorf("screencapture failed: %w", err)
 	}
 
-	f, err := os.Open(tmpFile)
+	return readScreenshot(tmp, source, region)
+}
+
+func buildArgs(path string, region *entity.Region) []string {
+	args := []string{"-x", "-t", "png"}
+	if region != nil {
+		args = append(args, "-R",
+			fmt.Sprintf("%d,%d,%d,%d", region.X, region.Y, region.Width, region.Height))
+	}
+	return append(args, path)
+}
+
+func readScreenshot(
+	path string, source entity.CaptureSource, region *entity.Region,
+) (*entity.Screenshot, error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("open screenshot: %w", err)
 	}
@@ -61,13 +74,13 @@ func (c *DarwinCapturer) runScreencapture(source entity.CaptureSource, region *e
 	if err != nil {
 		return nil, fmt.Errorf("decode png: %w", err)
 	}
-	bounds := img.Bounds()
 
-	data, err := os.ReadFile(tmpFile)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read screenshot: %w", err)
 	}
 
+	bounds := img.Bounds()
 	return &entity.Screenshot{
 		ID:        fmt.Sprintf("scr-%d", time.Now().UnixNano()),
 		Data:      data,

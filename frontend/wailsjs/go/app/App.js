@@ -22,8 +22,8 @@ export function ConfigureHotkeys(arg1) {
   return window['go']['app']['App']['ConfigureHotkeys'](arg1);
 }
 
-export function CopyToClipboard(arg1) {
-  return window['go']['app']['App']['CopyToClipboard'](arg1);
+export function CopyLastToClipboard() {
+  return window['go']['app']['App']['CopyLastToClipboard']();
 }
 
 export function ListWindows() {
@@ -38,8 +38,8 @@ export function SaveConfig(arg1) {
   return window['go']['app']['App']['SaveConfig'](arg1);
 }
 
-export function SaveScreenshotToFile(arg1) {
-  return window['go']['app']['App']['SaveScreenshotToFile'](arg1);
+export function SaveLastScreenshot(arg1) {
+  return window['go']['app']['App']['SaveLastScreenshot'](arg1);
 }
 
 export function StartRecording(arg1) {
