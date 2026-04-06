@@ -38,6 +38,24 @@ export namespace app {
 	        this.key = source["key"];
 	    }
 	}
+	export class RecordingResult {
+	    id: string;
+	    format: string;
+	    duration: number;
+	    outputPath: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RecordingResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.format = source["format"];
+	        this.duration = source["duration"];
+	        this.outputPath = source["outputPath"];
+	    }
+	}
 	export class WindowInfo {
 	    id: string;
 	    title: string;
@@ -135,48 +153,84 @@ export namespace entity {
 		    return a;
 		}
 	}
+
+}
+
+export namespace keys {
 	
-	export class Region {
-	    x: number;
-	    y: number;
-	    width: number;
-	    height: number;
+	export class Accelerator {
+	    Key: string;
+	    Modifiers: string[];
 	
 	    static createFrom(source: any = {}) {
-	        return new Region(source);
+	        return new Accelerator(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.x = source["x"];
-	        this.y = source["y"];
-	        this.width = source["width"];
-	        this.height = source["height"];
+	        this.Key = source["Key"];
+	        this.Modifiers = source["Modifiers"];
 	    }
 	}
-	export class Recording {
-	    id: string;
-	    state: string;
-	    format: string;
-	    region?: Region;
-	    // Go type: time
-	    startedAt: any;
-	    duration: number;
-	    outputPath: string;
+
+}
+
+export namespace menu {
+	
+	export class MenuItem {
+	    Label: string;
+	    Role: number;
+	    Accelerator?: keys.Accelerator;
+	    Type: string;
+	    Disabled: boolean;
+	    Hidden: boolean;
+	    Checked: boolean;
+	    SubMenu?: Menu;
 	
 	    static createFrom(source: any = {}) {
-	        return new Recording(source);
+	        return new MenuItem(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.state = source["state"];
-	        this.format = source["format"];
-	        this.region = this.convertValues(source["region"], Region);
-	        this.startedAt = this.convertValues(source["startedAt"], null);
-	        this.duration = source["duration"];
-	        this.outputPath = source["outputPath"];
+	        this.Label = source["Label"];
+	        this.Role = source["Role"];
+	        this.Accelerator = this.convertValues(source["Accelerator"], keys.Accelerator);
+	        this.Type = source["Type"];
+	        this.Disabled = source["Disabled"];
+	        this.Hidden = source["Hidden"];
+	        this.Checked = source["Checked"];
+	        this.SubMenu = this.convertValues(source["SubMenu"], Menu);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Menu {
+	    Items: MenuItem[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Menu(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Items = this.convertValues(source["Items"], MenuItem);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

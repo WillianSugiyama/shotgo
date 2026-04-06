@@ -8,7 +8,7 @@ import { useRecording } from "./useRecording";
  * and dispatches the corresponding capture/recording actions.
  */
 export function useHotkeyEvents() {
-  const { captureFullscreen, startRegionSelect } = useCapture();
+  const { captureFullscreen, captureRegion } = useCapture();
   const { start: startRecording, stop: stopRecording } = useRecording();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export function useHotkeyEvents() {
           captureFullscreen();
           break;
         case "capture_region":
-          startRegionSelect();
+          captureRegion();
           break;
         case "start_recording":
           startRecording();
@@ -34,5 +34,5 @@ export function useHotkeyEvents() {
     return () => {
       cancel();
     };
-  }, [captureFullscreen, startRegionSelect, startRecording, stopRecording]);
+  }, [captureFullscreen, captureRegion, startRecording, stopRecording]);
 }

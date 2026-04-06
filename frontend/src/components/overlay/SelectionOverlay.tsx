@@ -1,17 +1,13 @@
 import { useCallback } from "react";
 import { RegionSelector } from "./RegionSelector";
 import { useCapture } from "../../hooks/useCapture";
-import { Region } from "../../stores/captureStore";
 
 export function SelectionOverlay() {
   const { captureRegion, cancelCapture } = useCapture();
 
-  const handleSelect = useCallback(
-    (region: Region) => {
-      captureRegion(region);
-    },
-    [captureRegion],
-  );
+  const handleSelect = useCallback(() => {
+    captureRegion();
+  }, [captureRegion]);
 
   const handleCancel = useCallback(() => {
     cancelCapture();

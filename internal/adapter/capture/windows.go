@@ -38,6 +38,11 @@ func (c *WindowsCapturer) ListWindows() ([]port.WindowInfo, error) {
 	return nil, fmt.Errorf("ListWindows not yet implemented for windows")
 }
 
+func (c *WindowsCapturer) CaptureInteractive() (*entity.Screenshot, error) {
+	// TODO: implement interactive capture for Windows
+	return nil, fmt.Errorf("CaptureInteractive not yet implemented for windows")
+}
+
 // Compile-time interface check.
 var _ port.Capturer = (*WindowsCapturer)(nil)
 

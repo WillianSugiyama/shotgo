@@ -9,7 +9,7 @@ import { useAppStore } from "../stores/appStore";
  * and dispatches them to the appropriate hooks/stores.
  */
 export function useTrayEvents() {
-  const { captureFullscreen, startRegionSelect } = useCapture();
+  const { captureFullscreen, captureRegion } = useCapture();
   const { start: startRecording } = useRecording();
   const { setView } = useAppStore();
 
@@ -20,7 +20,7 @@ export function useTrayEvents() {
           captureFullscreen();
           break;
         case "capture-region":
-          startRegionSelect();
+          captureRegion();
           break;
         case "record-screen":
           setView("recorder");
@@ -40,5 +40,5 @@ export function useTrayEvents() {
     return () => {
       unsubscribe();
     };
-  }, [captureFullscreen, startRegionSelect, startRecording, setView]);
+  }, [captureFullscreen, captureRegion, startRecording, setView]);
 }

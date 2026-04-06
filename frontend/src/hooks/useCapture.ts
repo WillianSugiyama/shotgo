@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useCaptureStore, Region } from "../stores/captureStore";
+import { useCaptureStore } from "../stores/captureStore";
 import { useAppStore } from "../stores/appStore";
-import { CaptureFullscreen, CaptureRegion } from "../../wailsjs/go/app/App";
+import { CaptureFullscreen, CaptureInteractive } from "../../wailsjs/go/app/App";
 
 export function useCapture() {
   const { setCapturing, setImageData, setMode, reset } = useCaptureStore();
@@ -21,31 +21,24 @@ export function useCapture() {
     }
   }, [setMode, setCapturing, setImageData, setView]);
 
-  const captureRegion = useCallback(
-    async (region: Region) => {
-      setCapturing(true);
-      try {
-        const result = await CaptureRegion(region.x, region.y, region.width, region.height);
-        setImageData(result.imageBase64);
-        setView("editor");
-      } catch (err) {
-        console.error("Region capture failed:", err);
-      } finally {
-        setCapturing(false);
-      }
-    },
-    [setCapturing, setImageData, setView],
-  );
-
-  const startRegionSelect = useCallback(() => {
+  const captureRegion = useCallback(async () => {
     setMode("region");
-    setView("overlay");
-  }, [setMode, setView]);
+    setCapturing(true);
+    try {
+      const result = await CaptureInteractive();
+      setImageData(result.imageBase64);
+      setView("editor");
+    } catch (err) {
+      console.error("Region capture failed:", err);
+    } finally {
+      setCapturing(false);
+    }
+  }, [setMode, setCapturing, setImageData, setView]);
 
   const cancelCapture = useCallback(() => {
     reset();
     setView("idle");
   }, [reset, setView]);
 
-  return { captureFullscreen, captureRegion, startRegionSelect, cancelCapture };
+  return { captureFullscreen, captureRegion, cancelCapture };
 }

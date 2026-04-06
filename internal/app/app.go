@@ -17,8 +17,9 @@ type App struct {
 	// Last captured screenshot (held for save/copy operations)
 	lastScreenshot *entity.Screenshot
 
-	// Hotkey manager for registering/unregistering global hotkeys
-	hotkeyMgr port.HotkeyManager
+	// Platform adapters held for direct use
+	interactiveCapturer port.InteractiveCapturer
+	hotkeyMgr           port.HotkeyManager
 
 	// FFmpeg client for video conversion
 	ffmpegClient *ffmpeg.Client

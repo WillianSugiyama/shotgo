@@ -1,5 +1,4 @@
 import { useAppStore } from "./stores/appStore";
-import { SelectionOverlay } from "./components/overlay/SelectionOverlay";
 import { EditorCanvas } from "./components/editor/EditorCanvas";
 import { RecorderControls } from "./components/recorder/RecorderControls";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
@@ -16,8 +15,6 @@ function App() {
   }
 
   switch (view) {
-    case "overlay":
-      return <SelectionOverlay />;
     case "editor":
       return <EditorCanvas />;
     case "recorder":
@@ -31,7 +28,7 @@ function App() {
 
 function IdleView() {
   const { setView } = useAppStore();
-  const { captureFullscreen, startRegionSelect } = useCapture();
+  const { captureFullscreen, captureRegion } = useCapture();
 
   return (
     <div style={{ padding: 48, textAlign: "center", color: "#fff" }}>
@@ -41,7 +38,7 @@ function IdleView() {
         <button onClick={captureFullscreen} style={btnStyle}>
           Fullscreen
         </button>
-        <button onClick={startRegionSelect} style={btnStyle}>
+        <button onClick={captureRegion} style={btnStyle}>
           Region
         </button>
         <button onClick={() => setView("recorder")} style={btnStyle}>

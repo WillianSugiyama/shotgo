@@ -14,20 +14,23 @@ import (
 	"shotgo/internal/domain/port"
 )
 
-// DarwinCapturer implements port.Capturer using macOS screencapture CLI.
 type DarwinCapturer struct{}
 
-// NewDarwinCapturer returns a new DarwinCapturer.
-func NewDarwinCapturer() *DarwinCapturer {
-	return &DarwinCapturer{}
-}
+func NewDarwinCapturer() *DarwinCapturer { return &DarwinCapturer{} }
 
 func (c *DarwinCapturer) CaptureFullscreen() (*entity.Screenshot, error) {
-	return c.capture(entity.SourceFullscreen, nil)
+	return c.run(entity.SourceFullscreen, []string{"-x", "-t", "png"})
 }
 
 func (c *DarwinCapturer) CaptureRegion(region entity.Region) (*entity.Screenshot, error) {
-	return c.capture(entity.SourceRegion, &region)
+	args := []string{"-x", "-t", "png", "-R",
+		fmt.Sprintf("%d,%d,%d,%d", region.X, region.Y, region.Width, region.Height)}
+	return c.run(entity.SourceRegion, args)
+}
+
+// CaptureInteractive uses macOS native region selector (-i flag).
+func (c *DarwinCapturer) CaptureInteractive() (*entity.Screenshot, error) {
+	return c.run(entity.SourceRegion, []string{"-i", "-t", "png"})
 }
 
 func (c *DarwinCapturer) CaptureWindow(windowID string) (*entity.Screenshot, error) {
@@ -38,32 +41,20 @@ func (c *DarwinCapturer) ListWindows() ([]port.WindowInfo, error) {
 	return nil, fmt.Errorf("ListWindows not yet implemented")
 }
 
-func (c *DarwinCapturer) capture(
-	source entity.CaptureSource, region *entity.Region,
+func (c *DarwinCapturer) run(
+	source entity.CaptureSource, args []string,
 ) (*entity.Screenshot, error) {
 	tmp := filepath.Join(os.TempDir(), fmt.Sprintf("shotgo-%d.png", time.Now().UnixNano()))
 	defer func() { _ = os.Remove(tmp) }()
 
-	args := buildArgs(tmp, region)
-	if err := exec.Command("screencapture", args...).Run(); err != nil {
+	fullArgs := append(args, tmp)
+	if err := exec.Command("screencapture", fullArgs...).Run(); err != nil {
 		return nil, fmt.Errorf("screencapture failed: %w", err)
 	}
-
-	return readScreenshot(tmp, source, region)
+	return readScreenshot(tmp, source)
 }
 
-func buildArgs(path string, region *entity.Region) []string {
-	args := []string{"-x", "-t", "png"}
-	if region != nil {
-		args = append(args, "-R",
-			fmt.Sprintf("%d,%d,%d,%d", region.X, region.Y, region.Width, region.Height))
-	}
-	return append(args, path)
-}
-
-func readScreenshot(
-	path string, source entity.CaptureSource, region *entity.Region,
-) (*entity.Screenshot, error) {
+func readScreenshot(path string, source entity.CaptureSource) (*entity.Screenshot, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("open screenshot: %w", err)
@@ -88,7 +79,6 @@ func readScreenshot(
 		Height:    bounds.Dy(),
 		Format:    entity.FormatPNG,
 		Source:    source,
-		Region:    region,
 		CreatedAt: time.Now(),
 	}, nil
 }

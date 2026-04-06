@@ -3,6 +3,9 @@ package app
 import (
 	"encoding/base64"
 	"fmt"
+	"time"
+
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"shotgo/internal/domain/entity"
 )
@@ -17,9 +20,14 @@ type CaptureResult struct {
 	Source      string `json:"source"`
 }
 
-// CaptureFullscreen takes a screenshot of the entire screen.
+// CaptureFullscreen hides the window, captures, then shows the editor.
 func (a *App) CaptureFullscreen() (*CaptureResult, error) {
+	wailsRuntime.WindowHide(a.ctx)
+	time.Sleep(300 * time.Millisecond)
+
 	shot, err := a.captureFullscreen.Execute()
+
+	wailsRuntime.WindowShow(a.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -27,10 +35,15 @@ func (a *App) CaptureFullscreen() (*CaptureResult, error) {
 	return toCaptureResult(shot), nil
 }
 
-// CaptureRegion takes a screenshot of the selected area.
+// CaptureRegion hides the window, captures the region, then shows editor.
 func (a *App) CaptureRegion(x, y, width, height int) (*CaptureResult, error) {
+	wailsRuntime.WindowHide(a.ctx)
+	time.Sleep(300 * time.Millisecond)
+
 	region := entity.Region{X: x, Y: y, Width: width, Height: height}
 	shot, err := a.captureRegion.Execute(region)
+
+	wailsRuntime.WindowShow(a.ctx)
 	if err != nil {
 		return nil, err
 	}
