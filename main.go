@@ -24,10 +24,12 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 18, G: 18, B: 24, A: 1},
-		OnStartup:        application.Startup,
-		OnShutdown:       application.Shutdown,
-		Menu:             application.CreateMenu(),
+		BackgroundColour:  &options.RGBA{R: 18, G: 18, B: 24, A: 1},
+		StartHidden:       true,
+		HideWindowOnClose: true,
+		OnStartup:         application.Startup,
+		OnShutdown:        application.Shutdown,
+		Menu:              application.CreateMenu(),
 		Bind: []interface{}{
 			application,
 		},

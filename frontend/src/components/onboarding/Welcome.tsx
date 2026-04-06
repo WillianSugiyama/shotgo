@@ -4,11 +4,12 @@ import {
   CheckPermissions,
   RequestScreenCapture,
   OpenPermissionsSettings,
+  HideWindow,
 } from "../../../wailsjs/go/app/App";
 import { ArrowRight } from "lucide-react";
 import { color, space } from "../../styles/tokens";
 import { btnPrimary } from "../../styles/buttons";
-import { centerScreen, card, heading, subtext } from "../../styles/layout";
+import { centerScreen, heading, subtext } from "../../styles/layout";
 import { PermissionCard } from "./PermissionCard";
 
 export function Welcome() {
@@ -30,11 +31,26 @@ export function Welcome() {
   };
 
   useEffect(() => {
-    if (window.runtime) check();
-    else {
+    if (!window.runtime) {
       setChecking(false);
       setCheckFailed(true);
+      return;
     }
+    CheckPermissions()
+      .then((result) => {
+        if (result.screenCapture === "granted") {
+          setFirstLaunch(false);
+          HideWindow().catch(() => {});
+          setView("idle");
+        } else {
+          setScreenOk(false);
+          setChecking(false);
+        }
+      })
+      .catch(() => {
+        setChecking(false);
+        setCheckFailed(true);
+      });
   }, []);
 
   const handleRequest = async () => {
@@ -47,15 +63,11 @@ export function Welcome() {
   };
 
   const handleContinue = () => {
-    setView("idle");
     setFirstLaunch(false);
-  };
-
-  const hint: React.CSSProperties = {
-    fontSize: 12,
-    color: color.textMuted,
-    margin: `0 0 ${space.md}px`,
-    lineHeight: 1.5,
+    if (screenOk) {
+      HideWindow().catch(() => {});
+    }
+    setView("idle");
   };
 
   return (
@@ -73,11 +85,7 @@ export function Welcome() {
           onRecheck={check}
         />
       )}
-      {checking && (
-        <div style={{ ...card, textAlign: "center" }}>
-          <p style={hint}>Checking permissions...</p>
-        </div>
-      )}
+      {checking && <p style={{ color: color.textMuted, fontSize: 12 }}>Checking permissions...</p>}
       <button onClick={handleContinue} style={{ ...btnPrimary, marginTop: space.lg }}>
         {screenOk ? "Get Started" : "Continue anyway"} <ArrowRight size={14} />
       </button>

@@ -38,6 +38,10 @@ export function CreateMenu() {
   return window['go']['app']['App']['CreateMenu']();
 }
 
+export function HideWindow() {
+  return window['go']['app']['App']['HideWindow']();
+}
+
 export function ListRecordingSources() {
   return window['go']['app']['App']['ListRecordingSources']();
 }
@@ -56,6 +60,10 @@ export function OpenFile(arg1) {
 
 export function OpenPermissionsSettings() {
   return window['go']['app']['App']['OpenPermissionsSettings']();
+}
+
+export function PermissionsReady() {
+  return window['go']['app']['App']['PermissionsReady']();
 }
 
 export function RequestScreenCapture() {

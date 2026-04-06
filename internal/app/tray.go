@@ -1,11 +1,14 @@
 package app
 
 import (
-	"fyne.io/systray"
+	"log"
+
+	"github.com/ironpark/remotray"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var globalApp *App
+var trayInstance *remotray.SysTray
 
 func (a *App) emitAction(action string) {
 	if a.ctx != nil {
@@ -20,48 +23,63 @@ func (a *App) showWindow() {
 }
 
 func setupTray() {
-	systray.Register(onTrayReady, func() {})
+	opts := []remotray.Option{
+		remotray.WithTooltip("ShotGo"),
+	}
+	if len(trayIconPNG) > 0 {
+		opts = append(opts, remotray.WithIcon(trayIconPNG))
+	} else {
+		opts = append(opts, remotray.WithTitle("SG"))
+	}
+	tray, err := remotray.Run("shotgo-tray", opts...)
+	if err != nil {
+		log.Printf("[shotgo] tray failed: %v", err)
+		return
+	}
+	trayInstance = tray
+
+	add := func(title string, fn func()) {
+		item, err := tray.AddMenuItem(title, "")
+		if err != nil {
+			log.Printf("[shotgo] tray menu item '%s' failed: %v", title, err)
+			return
+		}
+		item.OnClick(func(_ remotray.MenuItem) { fn() })
+	}
+
+	add("Capture Fullscreen", func() {
+		if globalApp != nil {
+			globalApp.emitAction("capture-fullscreen")
+		}
+	})
+	add("Capture Region", func() {
+		if globalApp != nil {
+			globalApp.emitAction("capture-region")
+		}
+	})
+	add("Record Screen", func() {
+		if globalApp != nil {
+			globalApp.showWindow()
+			globalApp.emitAction("record-screen")
+		}
+	})
+	add("Settings", func() {
+		if globalApp != nil {
+			globalApp.showWindow()
+			globalApp.emitAction("settings")
+		}
+	})
+	add("Quit", func() {
+		if globalApp != nil {
+			wailsRuntime.Quit(globalApp.ctx)
+		}
+	})
+
+	log.Printf("[shotgo] tray running (separate process via IPC)")
 }
 
-func onTrayReady() {
-	systray.SetTitle("SG")
-	systray.SetTooltip("ShotGo")
-
-	mFull := systray.AddMenuItem("Capture Fullscreen", "Ctrl+Shift+1")
-	mRegion := systray.AddMenuItem("Capture Region", "Ctrl+Shift+2")
-	systray.AddSeparator()
-	mRecord := systray.AddMenuItem("Record Screen", "Ctrl+Shift+3")
-	systray.AddSeparator()
-	mSettings := systray.AddMenuItem("Settings", "")
-	mQuit := systray.AddMenuItem("Quit", "")
-
-	go func() {
-		for {
-			select {
-			case <-mFull.ClickedCh:
-				if globalApp != nil {
-					globalApp.emitAction("capture-fullscreen")
-				}
-			case <-mRegion.ClickedCh:
-				if globalApp != nil {
-					globalApp.emitAction("capture-region")
-				}
-			case <-mRecord.ClickedCh:
-				if globalApp != nil {
-					globalApp.showWindow()
-					globalApp.emitAction("record-screen")
-				}
-			case <-mSettings.ClickedCh:
-				if globalApp != nil {
-					globalApp.showWindow()
-					globalApp.emitAction("settings")
-				}
-			case <-mQuit.ClickedCh:
-				if globalApp != nil {
-					wailsRuntime.Quit(globalApp.ctx)
-				}
-				return
-			}
-		}
-	}()
+func teardownTray() {
+	if trayInstance != nil {
+		trayInstance.Quit()
+	}
 }

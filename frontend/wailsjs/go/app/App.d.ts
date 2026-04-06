@@ -23,6 +23,8 @@ export function CopyLastToClipboard():Promise<void>;
 
 export function CreateMenu():Promise<menu.Menu>;
 
+export function HideWindow():Promise<void>;
+
 export function ListRecordingSources():Promise<app.RecordingSources>;
 
 export function ListWindows():Promise<Array<app.WindowInfo>>;
@@ -32,6 +34,8 @@ export function LoadConfig():Promise<port.AppConfig>;
 export function OpenFile(arg1:string):Promise<void>;
 
 export function OpenPermissionsSettings():Promise<void>;
+
+export function PermissionsReady():Promise<boolean>;
 
 export function RequestScreenCapture():Promise<void>;
 
