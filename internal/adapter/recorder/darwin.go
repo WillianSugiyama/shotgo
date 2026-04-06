@@ -31,7 +31,7 @@ func NewDarwinRecorder(ffmpegPath, saveDir string) *DarwinRecorder {
 	return &DarwinRecorder{ffmpegPath: ffmpegPath, saveDir: saveDir}
 }
 
-func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) error {
+func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.recording {
@@ -45,12 +45,16 @@ func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) err
 	r.outPath = filepath.Join(r.saveDir, fmt.Sprintf("ShotGo_%s.mp4", ts))
 
 	input := screenIdx + ":none"
-	log.Printf("[shotgo] recording to %s (input=%s)", r.outPath, input)
-	r.cmd = exec.Command(r.ffmpegPath, "-y",
-		"-f", "avfoundation", "-framerate", "30",
-		"-capture_cursor", "1", "-i", input,
-		"-c:v", "libx264", "-preset", "ultrafast",
+	args := []string{"-y", "-f", "avfoundation", "-framerate", "30",
+		"-capture_cursor", "1", "-i", input}
+	if region != nil && region.IsValid() {
+		crop := fmt.Sprintf("crop=%d:%d:%d:%d", region.Width, region.Height, region.X, region.Y)
+		args = append(args, "-vf", crop)
+	}
+	args = append(args, "-c:v", "libx264", "-preset", "ultrafast",
 		"-pix_fmt", "yuv420p", r.outPath)
+	log.Printf("[shotgo] recording: %s %v", r.ffmpegPath, args)
+	r.cmd = exec.Command(r.ffmpegPath, args...)
 	r.cmd.Stderr = os.Stderr
 
 	var err error

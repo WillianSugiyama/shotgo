@@ -9,6 +9,8 @@ export function CaptureFullscreen():Promise<app.CaptureResult>;
 
 export function CaptureInteractive():Promise<app.CaptureResult>;
 
+export function CapturePreview():Promise<app.CaptureResult>;
+
 export function CaptureRegion(arg1:number,arg2:number,arg3:number,arg4:number):Promise<app.CaptureResult>;
 
 export function CaptureWindow(arg1:string):Promise<app.CaptureResult>;

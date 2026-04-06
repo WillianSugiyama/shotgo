@@ -9,6 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
 )
 
 //go:embed all:frontend/dist
@@ -24,10 +25,14 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 13, G: 13, B: 26, A: 1},
+		BackgroundColour: &options.RGBA{R: 18, G: 18, B: 24, A: 1},
+		StartHidden:      true,
 		OnStartup:        application.Startup,
 		OnShutdown:       application.Shutdown,
 		Menu:             application.CreateMenu(),
+		Mac: &mac.Options{
+			ActivationPolicy: mac.NSApplicationActivationPolicyAccessory,
+		},
 		Bind: []interface{}{
 			application,
 		},

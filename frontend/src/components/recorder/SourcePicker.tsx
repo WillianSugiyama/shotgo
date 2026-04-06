@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Monitor, Play } from "lucide-react";
-import { ListRecordingSources, CaptureFullscreen } from "../../../wailsjs/go/app/App";
+import { ListRecordingSources, CapturePreview } from "../../../wailsjs/go/app/App";
 import type { SelectedSource } from "../../stores/recordingStore";
-import { color, radius, space, font } from "../../styles/tokens";
+import { color } from "../../styles/tokens";
 import { btnPrimary } from "../../styles/buttons";
+import { pickerWrap, selectStyle, thumbStyle, placeholder } from "./sourcePickerStyles";
 
 interface Source {
   type: "screen" | "window";
@@ -20,8 +21,7 @@ export function SourcePicker({ onSelect }: Props) {
     { type: "screen", id: "0", name: "Fullscreen" },
   ]);
   const [selected, setSelected] = useState(0);
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [thumb, setThumb] = useState<string | null>(null);
 
   useEffect(() => {
     ListRecordingSources()
@@ -31,7 +31,7 @@ export function SourcePicker({ onSelect }: Props) {
           list.push({ type: "screen", id: String(s.index), name: s.name });
         }
         for (const w of src?.windows ?? []) {
-          list.push({ type: "window", id: w.id, name: `${w.app}` });
+          list.push({ type: "window", id: w.id, name: w.app });
         }
         setSources(list);
       })
@@ -39,23 +39,20 @@ export function SourcePicker({ onSelect }: Props) {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    setThumbnail(null);
-    CaptureFullscreen()
-      .then((res) => setThumbnail(res.imageBase64))
-      .catch(() => setThumbnail(null))
-      .finally(() => setLoading(false));
+    setThumb(null);
+    CapturePreview()
+      .then((res) => setThumb(res.imageBase64))
+      .catch(() => {});
   }, [selected]);
 
-  const current = sources[selected];
-
   return (
-    <div style={container}>
-      <Monitor size={40} color={color.accent} />
-      <p style={{ color: color.textMuted, fontSize: 13 }}>Select what to record</p>
-      {loading && <p style={{ color: color.textMuted, fontSize: 12 }}>Loading preview...</p>}
-      {!loading && thumbnail && (
-        <img src={`data:image/png;base64,${thumbnail}`} alt="Preview" style={thumbStyle} />
+    <div style={pickerWrap}>
+      {thumb ? (
+        <img src={thumb} alt="Preview" style={thumbStyle} />
+      ) : (
+        <div style={placeholder}>
+          <Monitor size={32} color={color.textMuted} />
+        </div>
       )}
       <select
         value={selected}
@@ -68,33 +65,12 @@ export function SourcePicker({ onSelect }: Props) {
           </option>
         ))}
       </select>
-      <button onClick={() => onSelect(current)} style={{ ...btnPrimary, padding: "12px 32px" }}>
+      <button
+        onClick={() => onSelect(sources[selected])}
+        style={{ ...btnPrimary, padding: "12px 32px" }}
+      >
         <Play size={16} fill="white" /> Start Recording
       </button>
     </div>
   );
 }
-
-const container: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: space.lg,
-};
-const selectStyle: React.CSSProperties = {
-  width: 280,
-  padding: `${space.sm}px ${space.md}px`,
-  fontSize: 14,
-  fontFamily: font.body,
-  background: color.surface,
-  color: color.text,
-  border: `1px solid ${color.border}`,
-  borderRadius: radius.md,
-  outline: "none",
-  cursor: "pointer",
-};
-const thumbStyle: React.CSSProperties = {
-  maxWidth: 280,
-  borderRadius: radius.md,
-  border: `1px solid ${color.border}`,
-};

@@ -61,6 +61,16 @@ func (a *App) CaptureWindow(windowID string) (*CaptureResult, error) {
 	return toCaptureResult(shot), nil
 }
 
+// CapturePreview takes a silent screenshot without hiding the window.
+// Used for thumbnails/previews in the recording source picker.
+func (a *App) CapturePreview() (*CaptureResult, error) {
+	shot, err := a.captureFullscreen.Execute()
+	if err != nil {
+		return nil, err
+	}
+	return toCaptureResult(shot), nil
+}
+
 func toCaptureResult(s *entity.Screenshot) *CaptureResult {
 	b64 := base64.StdEncoding.EncodeToString(s.Data)
 	return &CaptureResult{

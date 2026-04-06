@@ -1,41 +1,37 @@
-import { color, radius, space, font, transition } from "../../styles/tokens";
+import { color, radius, space, font } from "../../styles/tokens";
 
-export const card: React.CSSProperties = {
+export const pickerWrap: React.CSSProperties = {
   display: "flex",
+  flexDirection: "column",
   alignItems: "center",
-  gap: space.sm,
+  gap: space.md,
+};
+
+export const selectStyle: React.CSSProperties = {
+  width: 280,
   padding: `${space.sm}px ${space.md}px`,
+  fontSize: 14,
+  fontFamily: font.body,
   background: color.surface,
+  color: color.text,
   border: `1px solid ${color.border}`,
   borderRadius: radius.md,
   cursor: "pointer",
-  color: color.text,
-  fontSize: 14,
-  fontFamily: font.body,
-  transition: transition.fast,
-  width: "100%",
 };
 
-export const heading: React.CSSProperties = {
-  color: color.textMuted,
-  fontSize: 11,
-  fontWeight: 600,
-  textTransform: "uppercase",
-  letterSpacing: 1,
-  margin: `${space.sm}px 0 ${space.xs}px`,
+export const thumbStyle: React.CSSProperties = {
+  maxWidth: 280,
+  borderRadius: radius.md,
+  border: `1px solid ${color.border}`,
 };
 
-export const wrap: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: space.xs,
+export const placeholder: React.CSSProperties = {
   width: 280,
-  maxHeight: 340,
-  overflowY: "auto",
-};
-
-export const ellipsis: React.CSSProperties = {
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
+  height: 160,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: color.surface,
+  borderRadius: radius.md,
+  border: `1px solid ${color.border}`,
 };

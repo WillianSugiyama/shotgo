@@ -10,6 +10,10 @@ export function CaptureInteractive() {
   return window['go']['app']['App']['CaptureInteractive']();
 }
 
+export function CapturePreview() {
+  return window['go']['app']['App']['CapturePreview']();
+}
+
 export function CaptureRegion(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['CaptureRegion'](arg1, arg2, arg3, arg4);
 }

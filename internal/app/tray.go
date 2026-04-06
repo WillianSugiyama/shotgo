@@ -33,5 +33,8 @@ func handleTrayAction(tag int) {
 		wailsRuntime.Quit(globalApp.ctx)
 		return
 	}
+	if action == "settings" {
+		wailsRuntime.WindowShow(globalApp.ctx)
+	}
 	globalApp.emitAction(action)
 }
