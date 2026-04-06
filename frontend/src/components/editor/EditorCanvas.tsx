@@ -4,30 +4,35 @@ import { InteractiveCanvas } from "./InteractiveCanvas";
 import { useAppStore } from "../../stores/appStore";
 import { useCaptureStore } from "../../stores/captureStore";
 import { useEditorTools } from "../../hooks/useEditorTools";
+import { useToastStore } from "../../stores/toastStore";
 import { CopyLastToClipboard, SaveLastScreenshot } from "../../../wailsjs/go/app/App";
+import { color } from "../../styles/tokens";
 
 export function EditorCanvas() {
   const { setView } = useAppStore();
   const { imageData, reset } = useCaptureStore();
   const tools = useEditorTools();
+  const toast = useToastStore((s) => s.show);
 
   const handleSave = useCallback(async () => {
     try {
       await SaveLastScreenshot("");
+      toast("Screenshot saved", "success");
     } catch (err) {
-      console.error("Save failed:", err);
+      toast("Save failed", "error");
     }
     reset();
     setView("idle");
-  }, [reset, setView]);
+  }, [reset, setView, toast]);
 
   const handleCopy = useCallback(async () => {
     try {
       await CopyLastToClipboard();
+      toast("Copied to clipboard", "success");
     } catch (err) {
-      console.error("Copy failed:", err);
+      toast("Copy failed", "error");
     }
-  }, []);
+  }, [toast]);
 
   const handleCancel = useCallback(() => {
     reset();
@@ -39,11 +44,12 @@ export function EditorCanvas() {
       <Toolbar
         activeTool={tools.activeTool}
         onSelectTool={tools.setActiveTool}
+        onUndo={tools.undo}
         onSave={handleSave}
         onCopy={handleCopy}
         onCancel={handleCancel}
       />
-      <div style={{ flex: 1, overflow: "auto", background: "#0d0d1a" }}>
+      <div style={{ flex: 1, overflow: "auto", background: color.bg }}>
         <InteractiveCanvas
           imageData={imageData}
           annotations={tools.annotations}
