@@ -27,6 +27,7 @@ func New() *App {
 
 	return &App{
 		interactiveCapturer: capturer,
+		permissionsChecker:  perms,
 		hotkeyMgr:           hotkeyMgr,
 		ffmpegClient:        ffmpegClient,
 		captureFullscreen:   usecase.NewCaptureFullscreen(capturer),

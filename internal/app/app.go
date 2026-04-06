@@ -19,6 +19,7 @@ type App struct {
 
 	// Platform adapters held for direct use
 	interactiveCapturer port.InteractiveCapturer
+	permissionsChecker  port.PermissionsChecker
 	hotkeyMgr           port.HotkeyManager
 
 	// FFmpeg client for video conversion

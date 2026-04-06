@@ -42,6 +42,14 @@ export function LoadConfig() {
   return window['go']['app']['App']['LoadConfig']();
 }
 
+export function OpenPermissionsSettings() {
+  return window['go']['app']['App']['OpenPermissionsSettings']();
+}
+
+export function RequestScreenCapture() {
+  return window['go']['app']['App']['RequestScreenCapture']();
+}
+
 export function SaveConfig(arg1) {
   return window['go']['app']['App']['SaveConfig'](arg1);
 }

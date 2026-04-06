@@ -25,6 +25,10 @@ export function ListWindows():Promise<Array<app.WindowInfo>>;
 
 export function LoadConfig():Promise<port.AppConfig>;
 
+export function OpenPermissionsSettings():Promise<void>;
+
+export function RequestScreenCapture():Promise<void>;
+
 export function SaveConfig(arg1:port.AppConfig):Promise<void>;
 
 export function SaveLastScreenshot(arg1:string):Promise<void>;
