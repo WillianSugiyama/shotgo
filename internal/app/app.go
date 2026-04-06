@@ -22,7 +22,8 @@ type App struct {
 	permissionsChecker  port.PermissionsChecker
 	hotkeyMgr           port.HotkeyManager
 
-	// FFmpeg client for video conversion
+	// FFmpeg path and client for video conversion
+	ffmpegPath   string
 	ffmpegClient *ffmpeg.Client
 
 	// Use cases

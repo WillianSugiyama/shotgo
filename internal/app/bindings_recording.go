@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"shotgo/internal/adapter/recorder"
 	"shotgo/internal/domain/entity"
 )
 
@@ -61,4 +62,39 @@ type RecordingResult struct {
 	Format     string  `json:"format"`
 	Duration   float64 `json:"duration"`
 	OutputPath string  `json:"outputPath"`
+}
+
+// ListRecordingSources returns available screens and windows for recording.
+func (a *App) ListRecordingSources() *RecordingSources {
+	screens := recorder.ListScreens(a.ffmpegPath)
+	si := make([]ScreenInfo, len(screens))
+	for i, s := range screens {
+		si[i] = ScreenInfo{Index: s.Index, Name: s.Name}
+	}
+
+	windows := recorder.ListRecordableWindows()
+	wi := make([]RecWindowInfo, len(windows))
+	for i, w := range windows {
+		wi[i] = RecWindowInfo{ID: w.ID, Title: w.Title, App: w.App}
+	}
+	return &RecordingSources{Screens: si, Windows: wi}
+}
+
+// RecordingSources contains available recording targets.
+type RecordingSources struct {
+	Screens []ScreenInfo    `json:"screens"`
+	Windows []RecWindowInfo `json:"windows"`
+}
+
+// ScreenInfo is a frontend-facing screen descriptor.
+type ScreenInfo struct {
+	Index int    `json:"index"`
+	Name  string `json:"name"`
+}
+
+// RecWindowInfo is a frontend-facing window descriptor for recording.
+type RecWindowInfo struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	App   string `json:"app"`
 }
