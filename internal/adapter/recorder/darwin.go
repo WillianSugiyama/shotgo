@@ -5,6 +5,7 @@ package recorder
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,11 +44,14 @@ func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) err
 	ts := time.Now().Format("20060102_150405")
 	r.outPath = filepath.Join(r.saveDir, fmt.Sprintf("ShotGo_%s.mp4", ts))
 
+	input := screenIdx + ":none"
+	log.Printf("[shotgo] recording to %s (input=%s)", r.outPath, input)
 	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "avfoundation", "-framerate", "30",
-		"-capture_cursor", "1", "-i", screenIdx+":none",
+		"-capture_cursor", "1", "-i", input,
 		"-c:v", "libx264", "-preset", "ultrafast",
 		"-pix_fmt", "yuv420p", r.outPath)
+	r.cmd.Stderr = os.Stderr
 
 	var err error
 	r.stdin, err = r.cmd.StdinPipe()
