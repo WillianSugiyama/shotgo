@@ -2,24 +2,61 @@
 
 package clipboard
 
-import "fmt"
+import (
+	"fmt"
+	"syscall"
+	"unsafe"
+)
 
-// WindowsClipboard implements port.Clipboard using Win32 clipboard API.
+var (
+	user32          = syscall.NewLazyDLL("user32.dll")
+	kernel32        = syscall.NewLazyDLL("kernel32.dll")
+	pOpenClipboard  = user32.NewProc("OpenClipboard")
+	pCloseClipboard = user32.NewProc("CloseClipboard")
+	pEmptyClipboard = user32.NewProc("EmptyClipboard")
+	pSetClipData    = user32.NewProc("SetClipboardData")
+	pGlobalAlloc    = kernel32.NewProc("GlobalAlloc")
+	pGlobalLock     = kernel32.NewProc("GlobalLock")
+	pGlobalUnlock   = kernel32.NewProc("GlobalUnlock")
+)
+
+const (
+	cfUnicodeText = 13
+	cfDIB         = 8
+	gmemMoveable  = 0x0002
+)
+
 type WindowsClipboard struct{}
 
-// NewWindowsClipboard returns a new WindowsClipboard.
-func NewWindowsClipboard() *WindowsClipboard {
-	return &WindowsClipboard{}
-}
+func NewWindowsClipboard() *WindowsClipboard { return &WindowsClipboard{} }
 
 func (c *WindowsClipboard) CopyImage(data []byte) error {
-	// TODO: implement using OpenClipboard, EmptyClipboard, SetClipboardData
-	// with CF_DIB format (convert PNG to BMP/DIB first)
-	return fmt.Errorf("CopyImage not yet implemented for windows")
+	// TODO: convert PNG data to DIB format for CF_DIB clipboard
+	return fmt.Errorf("CopyImage: PNG to DIB conversion not yet implemented")
 }
 
 func (c *WindowsClipboard) CopyText(text string) error {
-	// TODO: implement using OpenClipboard, EmptyClipboard, SetClipboardData
-	// with CF_UNICODETEXT format
-	return fmt.Errorf("CopyText not yet implemented for windows")
+	pOpenClipboard.Call(0)
+	defer pCloseClipboard.Call()
+	pEmptyClipboard.Call()
+
+	u := syscall.StringToUTF16(text)
+	size := len(u) * 2
+	h, _, _ := pGlobalAlloc.Call(gmemMoveable, uintptr(size))
+	if h == 0 {
+		return fmt.Errorf("GlobalAlloc failed")
+	}
+
+	p, _, _ := pGlobalLock.Call(h)
+	if p == 0 {
+		return fmt.Errorf("GlobalLock failed")
+	}
+
+	src := unsafe.Slice((*byte)(unsafe.Pointer(&u[0])), size)
+	dst := unsafe.Slice((*byte)(unsafe.Pointer(p)), size)
+	copy(dst, src)
+	pGlobalUnlock.Call(h)
+
+	pSetClipData.Call(cfUnicodeText, h)
+	return nil
 }
