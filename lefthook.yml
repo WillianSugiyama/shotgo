@@ -2,28 +2,28 @@ pre-commit:
   parallel: true
   jobs:
     - name: oxfmt
-      root: "frontend/"
-      glob: "src/**/*.{ts,tsx}"
+      glob: "*.{ts,tsx}"
+      root: "frontend/src/"
       run: npx oxfmt --check {staged_files}
 
     - name: oxlint
-      root: "frontend/"
-      glob: "src/**/*.{ts,tsx}"
+      glob: "*.{ts,tsx}"
+      root: "frontend/src/"
       run: npx oxlint {staged_files}
 
     - name: typecheck
+      glob: "*.{ts,tsx}"
       root: "frontend/"
-      glob: "src/**/*.{ts,tsx}"
       run: npx tsgo --noEmit
 
     - name: go-lint
-      glob: "**/*.go"
+      glob: "*.go"
       run: golangci-lint run ./internal/...
 
     - name: go-fmt
-      glob: "**/*.go"
+      glob: "*.go"
       run: gofmt -l {staged_files} | grep . && exit 1 || exit 0
 
     - name: file-size
-      glob: "**/*.{go,ts,tsx}"
+      glob: "*.{go,ts,tsx}"
       run: bash scripts/check-file-size.sh {staged_files}

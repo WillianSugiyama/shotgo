@@ -32,7 +32,7 @@ function IdleView() {
   return (
     <div style={{ padding: 24, textAlign: "center", color: "#fff" }}>
       <h1>ShotGo</h1>
-      <p style={{ color: "#aaa" }}>Use hotkeys or the tray menu to capture.</p>
+      <p style={{ color: "#aaa" }}>Ready. Use hotkeys or the tray menu to capture.</p>
       <button onClick={() => setView("settings")} style={linkStyle}>
         Settings
       </button>
