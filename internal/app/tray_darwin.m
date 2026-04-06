@@ -4,7 +4,8 @@
 
 @interface SGTrayDelegate : NSObject
 - (void)menuAction:(NSMenuItem *)sender;
-- (void)setupTray;
+- (void)setupWithIconData:(NSData *)iconData;
+- (void)removeTray;
 @end
 
 @implementation SGTrayDelegate {
@@ -15,13 +16,13 @@
     goTrayCallback((int)sender.tag);
 }
 
-- (void)setupTray {
+- (void)setupWithIconData:(NSData *)iconData {
     _item = [[[NSStatusBar systemStatusBar]
         statusItemWithLength:NSSquareStatusItemLength] retain];
 
-    NSImage *img = [NSImage imageWithSystemSymbolName:@"camera.viewfinder"
-        accessibilityDescription:@"ShotGo"];
-    if (img) {
+    if (iconData && iconData.length > 0) {
+        NSImage *img = [[NSImage alloc] initWithData:iconData];
+        [img setSize:NSMakeSize(18, 18)];
         [img setTemplate:YES];
         _item.button.image = img;
     } else {
@@ -37,7 +38,7 @@
     [self addTo:m title:@"Settings" tag:4 key:@","];
     [self addTo:m title:@"Quit ShotGo" tag:5 key:@"q"];
     _item.menu = m;
-    fprintf(stderr, "[shotgo] tray: status item visible\n");
+    fprintf(stderr, "[shotgo] tray: status item created\n");
 }
 
 - (void)addTo:(NSMenu *)m title:(NSString *)t tag:(int)tag key:(NSString *)k {
@@ -59,10 +60,14 @@
 
 static SGTrayDelegate *_sgDel = nil;
 
-void SGSetupTray(void) {
+void SGSetupTrayWithIcon(const void *iconBytes, int iconLen) {
+    NSData *data = nil;
+    if (iconBytes && iconLen > 0) {
+        data = [NSData dataWithBytes:iconBytes length:iconLen];
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         _sgDel = [[SGTrayDelegate alloc] init];
-        [_sgDel setupTray];
+        [_sgDel setupWithIconData:data];
     });
 }
 

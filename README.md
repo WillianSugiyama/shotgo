@@ -1,8 +1,11 @@
-# ShotGo
+<p align="center">
+  <img src="frontend/src/assets/images/logo.svg" alt="ShotGo" width="400" />
+</p>
 
-Open-source screenshot and screen recording tool for macOS and Windows, built with Go and Wails.
-
-Inspired by CleanShot X and Lightshot — fast, lightweight, and free.
+<p align="center">
+  Open-source screenshot and screen recording tool for macOS and Windows, built with Go and Wails.<br/>
+  Inspired by CleanShot X and Lightshot — fast, lightweight, and free.
+</p>
 
 ## Features
 
