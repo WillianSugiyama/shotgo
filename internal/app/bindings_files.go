@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,10 +18,11 @@ func (a *App) OpenFile(path string) error {
 
 // RevealFile reveals a file in Finder/Explorer.
 func (a *App) RevealFile(path string) error {
+	log.Printf("[shotgo] RevealFile: %s", path)
 	if runtime.GOOS == "darwin" {
-		return exec.Command("open", "-R", path).Start()
+		return exec.Command("open", "-R", path).Run()
 	}
-	return exec.Command("explorer", "/select,", path).Start()
+	return exec.Command("explorer", "/select,", path).Run()
 }
 
 // SaveDir returns the default save directory.
