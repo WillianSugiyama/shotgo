@@ -23,6 +23,7 @@ func New() *App {
 	configStore, _ := storage.NewJSONConfigStore("")
 
 	return &App{
+		hotkeyMgr:         hotkeyMgr,
 		captureFullscreen: usecase.NewCaptureFullscreen(capturer),
 		captureRegion:     usecase.NewCaptureRegion(capturer),
 		captureWindow:     usecase.NewCaptureWindow(capturer),

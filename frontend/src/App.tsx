@@ -4,9 +4,11 @@ import { EditorCanvas } from "./components/editor/EditorCanvas";
 import { RecorderControls } from "./components/recorder/RecorderControls";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
 import { Welcome } from "./components/onboarding/Welcome";
+import { useTrayEvents } from "./hooks/useTrayEvents";
 
 function App() {
   const { view, isFirstLaunch } = useAppStore();
+  useTrayEvents();
 
   if (isFirstLaunch) {
     return <Welcome />;

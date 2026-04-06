@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"shotgo/internal/domain/entity"
+	"shotgo/internal/domain/port"
 	"shotgo/internal/usecase"
 )
 
@@ -14,6 +15,9 @@ type App struct {
 
 	// Last captured screenshot (held for save/copy operations)
 	lastScreenshot *entity.Screenshot
+
+	// Hotkey manager for registering/unregistering global hotkeys
+	hotkeyMgr port.HotkeyManager
 
 	// Use cases
 	captureFullscreen *usecase.CaptureFullscreen
