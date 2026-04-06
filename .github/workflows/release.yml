@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        run: cd frontend && npm ci
+
+      - name: Build
+        run: wails build -platform darwin/universal
+
+      - name: Create DMG
+        run: |
+          hdiutil create -volname "ShotGo" \
+            -srcfolder build/bin/ShotGo.app \
+            -ov -format UDZO build/bin/ShotGo.dmg
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/bin/ShotGo.dmg
+
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        run: cd frontend && npm ci
+
+      - name: Build
+        run: wails build -platform windows/amd64
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/bin/shotgo.exe
