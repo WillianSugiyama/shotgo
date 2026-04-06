@@ -15,42 +15,35 @@ import (
 )
 
 type DarwinRecorder struct {
-	mu                sync.Mutex
-	ffmpegPath        string
-	cmd               *exec.Cmd
-	stdin             io.WriteCloser
-	recording, paused bool
-	format            entity.OutputFormat
-	outPath           string
-	startTime         time.Time
+	mu         sync.Mutex
+	ffmpegPath string
+	cmd        *exec.Cmd
+	stdin      io.WriteCloser
+	recording  bool
+	format     entity.OutputFormat
+	outPath    string
+	startTime  time.Time
 }
 
 func NewDarwinRecorder(ffmpegPath string) *DarwinRecorder {
 	return &DarwinRecorder{ffmpegPath: ffmpegPath}
 }
 
-func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat) error {
+func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.recording {
 		return fmt.Errorf("already recording")
 	}
 
+	screenIdx := findScreenIndex(r.ffmpegPath)
 	r.format = format
 	r.outPath = filepath.Join(os.TempDir(),
 		fmt.Sprintf("shotgo-rec-%d.mp4", time.Now().UnixNano()))
 
-	// ffmpeg with avfoundation captures screen on macOS
-	input := "1:none" // screen index 1, no audio
-	if region != nil {
-		input = fmt.Sprintf("1:none -video_size %dx%d -offset_x %d -offset_y %d",
-			region.Width, region.Height, region.X, region.Y)
-	}
-	_ = input // TODO: use region params in ffmpeg args
-
 	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "avfoundation", "-framerate", "30",
-		"-capture_cursor", "1", "-i", "1:none",
+		"-capture_cursor", "1", "-i", screenIdx+":none",
 		"-c:v", "libx264", "-preset", "ultrafast",
 		"-pix_fmt", "yuv420p", r.outPath)
 
@@ -82,7 +75,6 @@ func (r *DarwinRecorder) Stop() (*entity.Recording, error) {
 	}
 	duration := time.Since(r.startTime)
 	r.recording = false
-	r.paused = false
 	return &entity.Recording{
 		ID:    fmt.Sprintf("rec-%d", time.Now().UnixNano()),
 		State: entity.RecordingStopped, Format: r.format,
