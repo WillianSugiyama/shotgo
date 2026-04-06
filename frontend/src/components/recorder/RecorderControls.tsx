@@ -1,8 +1,19 @@
-import { ArrowLeft, Circle, Pause, Play, Square } from "lucide-react";
+import { ArrowLeft, Pause, Play, Square } from "lucide-react";
 import { useRecording } from "../../hooks/useRecording";
 import { useAppStore } from "../../stores/appStore";
-import { color, font, radius, space, transition } from "../../styles/tokens";
-import { btnPrimary, btnDanger, btnGhost, btnSecondary } from "../../styles/buttons";
+import { space } from "../../styles/tokens";
+import { btnDanger, btnSecondary } from "../../styles/buttons";
+import { SourcePicker } from "./SourcePicker";
+import {
+  recContainer,
+  timerText,
+  recRow,
+  recDot,
+  recBox,
+  timerRow,
+  timerSub,
+  backBtnStyle,
+} from "./recorderStyles";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -12,68 +23,41 @@ function formatTime(seconds: number): string {
   return `${m}:${s}`;
 }
 
-const pulseKeyframes = `@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`;
-
-const container: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  height: "100vh",
-  gap: space.lg,
-  background: color.bg,
-};
-
-const timerStyle: React.CSSProperties = {
-  fontFamily: font.mono,
-  fontSize: 48,
-  fontWeight: 700,
-  color: color.text,
-  letterSpacing: 2,
-};
-
-const row: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: space.md,
-};
-
-const dot: React.CSSProperties = {
-  width: 12,
-  height: 12,
-  borderRadius: radius.pill,
-  background: color.recording,
-  animation: "pulse-dot 1s ease-in-out infinite",
-};
+const pulseCSS = "@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}";
 
 export function RecorderControls() {
   const { state, elapsedSeconds, maxSeconds, start, stop, pause, resume } = useRecording();
   const { setView } = useAppStore();
+  const isRec = state === "recording";
+
+  const backBtn = (
+    <button title="Back" onClick={() => setView("idle")} style={backBtnStyle}>
+      <ArrowLeft size={18} /> Back
+    </button>
+  );
+
+  if (state === "idle") {
+    return (
+      <div style={recContainer}>
+        {backBtn}
+        <SourcePicker onSelect={(src) => start(src)} />
+      </div>
+    );
+  }
 
   return (
-    <div style={container}>
-      <style>{pulseKeyframes}</style>
-
-      <div style={{ display: "flex", alignItems: "center", gap: space.sm }}>
-        {state === "recording" && <span style={dot} />}
-        <span style={timerStyle}>{formatTime(elapsedSeconds)}</span>
-        <span style={{ color: color.textMuted, fontSize: 16, fontFamily: font.mono }}>
-          / {formatTime(maxSeconds)}
-        </span>
+    <div style={recContainer}>
+      <style>{pulseCSS}</style>
+      {backBtn}
+      <div style={isRec ? recBox : { padding: space.lg }}>
+        <div style={timerRow}>
+          {isRec && <span style={recDot} />}
+          <span style={timerText}>{formatTime(elapsedSeconds)}</span>
+          <span style={timerSub}>/ {formatTime(maxSeconds)}</span>
+        </div>
       </div>
-
-      <div style={row}>
-        {state === "idle" && (
-          <>
-            <button title="Back" onClick={() => setView("idle")} style={btnGhost}>
-              <ArrowLeft size={18} />
-            </button>
-            <button onClick={start} style={{ ...btnPrimary, background: color.recording }}>
-              <Circle size={16} fill="white" /> Record
-            </button>
-          </>
-        )}
-        {state === "recording" && (
+      <div style={recRow}>
+        {isRec && (
           <>
             <button onClick={pause} style={btnSecondary}>
               <Pause size={16} /> Pause

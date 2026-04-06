@@ -34,6 +34,10 @@ export function CreateMenu() {
   return window['go']['app']['App']['CreateMenu']();
 }
 
+export function ListRecordingSources() {
+  return window['go']['app']['App']['ListRecordingSources']();
+}
+
 export function ListWindows() {
   return window['go']['app']['App']['ListWindows']();
 }

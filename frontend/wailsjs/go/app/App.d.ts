@@ -21,6 +21,8 @@ export function CopyLastToClipboard():Promise<void>;
 
 export function CreateMenu():Promise<menu.Menu>;
 
+export function ListRecordingSources():Promise<app.RecordingSources>;
+
 export function ListWindows():Promise<Array<app.WindowInfo>>;
 
 export function LoadConfig():Promise<port.AppConfig>;

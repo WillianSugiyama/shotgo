@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRecordingStore } from "../stores/recordingStore";
+import type { SelectedSource } from "../stores/recordingStore";
 import { StartRecording, StopRecording } from "../../wailsjs/go/app/App";
 
 export function useRecording() {
   const store = useRecordingStore();
-  const { state, format, elapsedSeconds, maxSeconds } = store;
-  const { setState, setElapsedSeconds, reset } = store;
+  const { state, format, elapsedSeconds, maxSeconds, selectedSource } = store;
+  const { setState, setElapsedSeconds, setSelectedSource, reset } = store;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -28,15 +29,19 @@ export function useRecording() {
     }
   }, [elapsedSeconds, maxSeconds, state]);
 
-  const start = useCallback(async () => {
-    try {
-      await StartRecording(format);
-      setState("recording");
-      setElapsedSeconds(0);
-    } catch (err) {
-      console.error("Start recording failed:", err);
-    }
-  }, [format, setState, setElapsedSeconds]);
+  const start = useCallback(
+    async (source?: SelectedSource) => {
+      try {
+        if (source) setSelectedSource(source);
+        await StartRecording(format);
+        setState("recording");
+        setElapsedSeconds(0);
+      } catch (err) {
+        console.error("Start recording failed:", err);
+      }
+    },
+    [format, setState, setElapsedSeconds, setSelectedSource],
+  );
 
   const stop = useCallback(async () => {
     try {
@@ -50,5 +55,15 @@ export function useRecording() {
   const pause = useCallback(() => setState("paused"), [setState]);
   const resume = useCallback(() => setState("recording"), [setState]);
 
-  return { state, elapsedSeconds, maxSeconds, start, stop, pause, resume, reset };
+  return {
+    state,
+    elapsedSeconds,
+    maxSeconds,
+    selectedSource,
+    start,
+    stop,
+    pause,
+    resume,
+    reset,
+  };
 }
