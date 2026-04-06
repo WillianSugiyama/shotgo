@@ -1,23 +1,72 @@
+import { useState, useCallback } from "react";
 import { useSettings } from "../../hooks/useSettings";
+import { HotkeyBinding } from "../../stores/settingsStore";
 import { color, radius, space, font } from "../../styles/tokens";
 
 const actionLabels: Record<string, string> = {
-  capture_fullscreen: "Capture Fullscreen",
-  capture_region: "Capture Region",
-  capture_window: "Capture Window",
-  start_recording: "Start Recording",
-  stop_recording: "Stop Recording",
+  capture_fullscreen: "Fullscreen",
+  capture_region: "Region",
+  start_recording: "Start Record",
+  stop_recording: "Stop Record",
 };
 
-const kbd: React.CSSProperties = {
-  padding: "2px 10px",
-  fontSize: 12,
-  fontFamily: font.mono,
-  background: color.bg,
-  border: `1px solid ${color.border}`,
-  borderRadius: radius.sm,
-  color: color.text,
-};
+export function HotkeyConfig() {
+  const { hotkeys, updateHotkeys } = useSettings();
+  const [editing, setEditing] = useState<string | null>(null);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, action: string) => {
+      e.preventDefault();
+      if (e.key === "Escape") {
+        setEditing(null);
+        return;
+      }
+      const mods: string[] = [];
+      if (e.metaKey) mods.push("Cmd");
+      if (e.ctrlKey) mods.push("Ctrl");
+      if (e.shiftKey) mods.push("Shift");
+      if (e.altKey) mods.push("Alt");
+      const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      if (mods.length === 0 || ["Meta", "Control", "Shift", "Alt"].includes(e.key)) return;
+
+      const updated: HotkeyBinding[] = hotkeys.map((h) =>
+        h.action === action ? { ...h, modifiers: mods, key } : h,
+      );
+      updateHotkeys(updated);
+      setEditing(null);
+    },
+    [hotkeys, updateHotkeys],
+  );
+
+  return (
+    <div>
+      {hotkeys.map((b) => (
+        <div key={b.action} style={row}>
+          <span style={{ fontSize: 13, color: color.text }}>
+            {actionLabels[b.action] ?? b.action}
+          </span>
+          {editing === b.action ? (
+            <input
+              autoFocus
+              readOnly
+              onKeyDown={(e) => handleKeyDown(e, b.action)}
+              onBlur={() => setEditing(null)}
+              placeholder="Press keys..."
+              style={inputKbd}
+            />
+          ) : (
+            <button onClick={() => setEditing(b.action)} style={kbd}>
+              {[...b.modifiers, b.key].join(" + ")}
+            </button>
+          )}
+        </div>
+      ))}
+      <p style={{ fontSize: 11, color: color.textMuted, marginTop: space.sm }}>
+        Click a shortcut to re-bind. Press Escape to cancel.
+      </p>
+    </div>
+  );
+}
 
 const row: React.CSSProperties = {
   display: "flex",
@@ -27,28 +76,20 @@ const row: React.CSSProperties = {
   borderBottom: `1px solid ${color.border}`,
 };
 
-export function HotkeyConfig() {
-  const { hotkeys } = useSettings();
+const kbd: React.CSSProperties = {
+  padding: "4px 12px",
+  fontSize: 12,
+  fontFamily: font.mono,
+  background: color.bg,
+  border: `1px solid ${color.border}`,
+  borderRadius: radius.sm,
+  color: color.text,
+  cursor: "pointer",
+};
 
-  if (hotkeys.length === 0) {
-    return (
-      <p style={{ fontSize: 13, color: color.textMuted, lineHeight: 1.6 }}>
-        No hotkeys configured yet. Edit <code style={kbd}>config.json</code> to set shortcuts.
-      </p>
-    );
-  }
-
-  return (
-    <div>
-      <p style={{ fontSize: 12, color: color.textMuted, marginBottom: space.sm }}>
-        Hotkeys can be configured in <code style={kbd}>config.json</code>.
-      </p>
-      {hotkeys.map((b) => (
-        <div key={b.action} style={row}>
-          <span style={{ fontSize: 14 }}>{actionLabels[b.action] ?? b.action}</span>
-          <kbd style={kbd}>{[...b.modifiers, b.key].join(" + ")}</kbd>
-        </div>
-      ))}
-    </div>
-  );
-}
+const inputKbd: React.CSSProperties = {
+  ...kbd,
+  outline: `2px solid ${color.accent}`,
+  width: 140,
+  textAlign: "center",
+};

@@ -73,6 +73,7 @@ func (s *JSONConfigStore) Default() *port.AppConfig {
 		SaveDirectory:     defaultSaveDir(),
 		ImageFormat:       entity.FormatPNG,
 		RecordFormat:      entity.FormatMP4,
+		Hotkeys:           DefaultHotkeys(),
 		LaunchAtStartup:   false,
 		ShowNotifications: true,
 	}

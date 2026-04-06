@@ -12,6 +12,8 @@ export function HoverBtn({ style, children, hoverBg, ...props }: Props) {
       style={{ ...style, ...(h ? { background: hoverBg } : {}) }}
       onMouseEnter={() => setH(true)}
       onMouseLeave={() => setH(false)}
-    />
+    >
+      {children}
+    </button>
   );
 }

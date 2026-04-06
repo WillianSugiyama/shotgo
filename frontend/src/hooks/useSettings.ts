@@ -13,6 +13,17 @@ export function useSettings() {
       store.setImageFormat(config.imageFormat as "png" | "jpeg");
       store.setRecordFormat(config.recordFormat as "mp4" | "gif");
       store.setLaunchAtStartup(config.launchAtStartup);
+      if (config.hotkeys?.bindings) {
+        store.setHotkeys(
+          config.hotkeys.bindings.map(
+            (b: { action: string; combo: { modifiers: string[]; key: string } }) => ({
+              action: b.action,
+              modifiers: b.combo.modifiers || [],
+              key: b.combo.key,
+            }),
+          ),
+        );
+      }
     } catch (err) {
       console.error("Load settings failed:", err);
     }
