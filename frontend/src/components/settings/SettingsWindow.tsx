@@ -1,7 +1,20 @@
+import { ArrowLeft, FolderOpen, Monitor, Keyboard } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
+import { useAppStore } from "../../stores/appStore";
+import { btnPrimary, btnGhost } from "../../styles/buttons";
 import { HotkeyConfig } from "./HotkeyConfig";
+import {
+  container,
+  header,
+  section,
+  sectionTitle,
+  inputStyle,
+  labelStyle,
+  checkboxLabel,
+} from "./settingsStyles";
 
 export function SettingsWindow() {
+  const { setView } = useAppStore();
   const {
     saveDirectory,
     imageFormat,
@@ -14,72 +27,74 @@ export function SettingsWindow() {
     saveSettings,
   } = useSettings();
 
+  const onSave = async () => {
+    await saveSettings();
+    setView("idle");
+  };
+
   return (
-    <div style={{ padding: 24, color: "#fff", maxWidth: 480 }}>
-      <h2>Settings</h2>
+    <div style={container}>
+      <div style={header}>
+        <button onClick={() => setView("idle")} style={btnGhost}>
+          <ArrowLeft size={18} />
+        </button>
+        <h2 style={{ fontSize: 20, fontWeight: 600 }}>Settings</h2>
+      </div>
 
-      <label>Save Directory</label>
-      <input
-        value={saveDirectory}
-        onChange={(e) => setSaveDirectory(e.target.value)}
-        style={inputStyle}
-      />
-
-      <label>Image Format</label>
-      <select
-        value={imageFormat}
-        onChange={(e) => setImageFormat(e.target.value as "png" | "jpeg")}
-        style={inputStyle}
-      >
-        <option value="png">PNG</option>
-        <option value="jpeg">JPEG</option>
-      </select>
-
-      <label>Recording Format</label>
-      <select
-        value={recordFormat}
-        onChange={(e) => setRecordFormat(e.target.value as "mp4" | "gif")}
-        style={inputStyle}
-      >
-        <option value="mp4">MP4</option>
-        <option value="gif">GIF</option>
-      </select>
-
-      <label>
+      <div style={section}>
+        <div style={sectionTitle}>
+          <FolderOpen size={15} /> Output
+        </div>
+        <label style={labelStyle}>Save Directory</label>
         <input
-          type="checkbox"
-          checked={launchAtStartup}
-          onChange={(e) => setLaunchAtStartup(e.target.checked)}
-        />{" "}
-        Launch at startup
-      </label>
+          style={inputStyle}
+          value={saveDirectory}
+          onChange={(e) => setSaveDirectory(e.target.value)}
+        />
+        <label style={labelStyle}>Image Format</label>
+        <select
+          style={inputStyle}
+          value={imageFormat}
+          onChange={(e) => setImageFormat(e.target.value as "png" | "jpeg")}
+        >
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
+        <label style={labelStyle}>Recording Format</label>
+        <select
+          style={inputStyle}
+          value={recordFormat}
+          onChange={(e) => setRecordFormat(e.target.value as "mp4" | "gif")}
+        >
+          <option value="mp4">MP4</option>
+          <option value="gif">GIF</option>
+        </select>
+      </div>
 
-      <HotkeyConfig />
+      <div style={section}>
+        <div style={sectionTitle}>
+          <Monitor size={15} /> System
+        </div>
+        <label style={checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={launchAtStartup}
+            onChange={(e) => setLaunchAtStartup(e.target.checked)}
+          />
+          Launch at startup
+        </label>
+      </div>
 
-      <button onClick={saveSettings} style={btnStyle}>
+      <div style={section}>
+        <div style={sectionTitle}>
+          <Keyboard size={15} /> Hotkeys
+        </div>
+        <HotkeyConfig />
+      </div>
+
+      <button onClick={onSave} style={{ ...btnPrimary, width: "100%", justifyContent: "center" }}>
         Save
       </button>
     </div>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  padding: 8,
-  marginBottom: 12,
-  background: "#2d2d44",
-  color: "#fff",
-  border: "1px solid #444",
-  borderRadius: 4,
-};
-
-const btnStyle: React.CSSProperties = {
-  marginTop: 16,
-  padding: "8px 24px",
-  background: "#4A90D9",
-  color: "#fff",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-};

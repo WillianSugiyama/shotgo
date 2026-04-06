@@ -1,4 +1,5 @@
 import { useSettings } from "../../hooks/useSettings";
+import { color, radius, space, font } from "../../styles/tokens";
 
 const actionLabels: Record<string, string> = {
   capture_fullscreen: "Capture Fullscreen",
@@ -8,35 +9,46 @@ const actionLabels: Record<string, string> = {
   stop_recording: "Stop Recording",
 };
 
+const kbd: React.CSSProperties = {
+  padding: "2px 10px",
+  fontSize: 12,
+  fontFamily: font.mono,
+  background: color.bg,
+  border: `1px solid ${color.border}`,
+  borderRadius: radius.sm,
+  color: color.text,
+};
+
+const row: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: `${space.sm}px 0`,
+  borderBottom: `1px solid ${color.border}`,
+};
+
 export function HotkeyConfig() {
   const { hotkeys } = useSettings();
 
+  if (hotkeys.length === 0) {
+    return (
+      <p style={{ fontSize: 13, color: color.textMuted, lineHeight: 1.6 }}>
+        No hotkeys configured yet. Edit <code style={kbd}>config.json</code> to set shortcuts.
+      </p>
+    );
+  }
+
   return (
-    <div style={{ marginTop: 16 }}>
-      <h3>Hotkeys</h3>
-      {hotkeys.length === 0 && <p style={{ color: "#888" }}>No hotkeys configured yet.</p>}
-      {hotkeys.map((binding) => (
-        <div
-          key={binding.action}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 0",
-            borderBottom: "1px solid #333",
-          }}
-        >
-          <span>{actionLabels[binding.action] ?? binding.action}</span>
-          <kbd style={kbdStyle}>{[...binding.modifiers, binding.key].join(" + ")}</kbd>
+    <div>
+      <p style={{ fontSize: 12, color: color.textMuted, marginBottom: space.sm }}>
+        Hotkeys can be configured in <code style={kbd}>config.json</code>.
+      </p>
+      {hotkeys.map((b) => (
+        <div key={b.action} style={row}>
+          <span style={{ fontSize: 14 }}>{actionLabels[b.action] ?? b.action}</span>
+          <kbd style={kbd}>{[...b.modifiers, b.key].join(" + ")}</kbd>
         </div>
       ))}
     </div>
   );
 }
-
-const kbdStyle: React.CSSProperties = {
-  padding: "2px 8px",
-  background: "#1a1a2e",
-  border: "1px solid #555",
-  borderRadius: 4,
-  fontFamily: "monospace",
-};
