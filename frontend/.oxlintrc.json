@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "no-console": "warn"
+  },
+  "categories": {
+    "correctness": "warn"
+  },
+  "globals": {
+    "document": "readonly",
+    "window": "readonly",
+    "console": "readonly",
+    "setTimeout": "readonly",
+    "clearTimeout": "readonly",
+    "setInterval": "readonly",
+    "clearInterval": "readonly",
+    "HTMLCanvasElement": "readonly",
+    "HTMLDivElement": "readonly",
+    "CanvasRenderingContext2D": "readonly",
+    "ImageData": "readonly",
+    "ReturnType": "readonly"
+  },
+  "ignorePatterns": ["wailsjs/**", "dist/**", "node_modules/**"]
+}
