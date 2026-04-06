@@ -1,22 +1,24 @@
-import { useEffect } from "react";
-import { ArrowLeft, FolderOpen, Monitor, Keyboard } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Monitor, Keyboard, Check } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { useAppStore } from "../../stores/appStore";
 import { btnPrimary, btnGhost } from "../../styles/buttons";
+import { color } from "../../styles/tokens";
 import { HotkeyConfig } from "./HotkeyConfig";
-import {
-  container,
-  header,
-  section,
-  sectionTitle,
-  inputStyle,
-  labelStyle,
-  checkboxLabel,
-} from "./settingsStyles";
+import { OutputSection } from "./OutputSection";
+import { container, header, section, sectionTitle, checkboxLabel } from "./settingsStyles";
+
+const backBtn: React.CSSProperties = {
+  ...btnGhost,
+  color: color.text,
+  fontSize: 14,
+  fontWeight: 500,
+};
 
 export function SettingsWindow() {
   const { setView } = useAppStore();
   const s = useSettings();
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     s.loadSettings();
@@ -24,46 +26,31 @@ export function SettingsWindow() {
 
   const onSave = async () => {
     await s.saveSettings();
-    setView("idle");
+    setSaved(true);
+    setTimeout(() => {
+      setSaved(false);
+      setView("idle");
+    }, 800);
   };
 
   return (
-    <div style={container}>
+    <div style={container} className="view-transition">
       <div style={header}>
-        <button onClick={() => setView("idle")} style={btnGhost}>
-          <ArrowLeft size={18} />
+        <button onClick={() => setView("idle")} style={backBtn}>
+          <ArrowLeft size={18} /> Back
         </button>
-        <h2 style={{ fontSize: 20, fontWeight: 600 }}>Settings</h2>
+        <div style={{ flex: 1 }} />
+        <h2 style={{ fontSize: 20, fontWeight: 600, color: color.text }}>Settings</h2>
+        <div style={{ flex: 1 }} />
       </div>
-      <div style={section}>
-        <div style={sectionTitle}>
-          <FolderOpen size={15} /> Output
-        </div>
-        <label style={labelStyle}>Save Directory</label>
-        <input
-          style={inputStyle}
-          value={s.saveDirectory}
-          onChange={(e) => s.setSaveDirectory(e.target.value)}
-        />
-        <label style={labelStyle}>Image Format</label>
-        <select
-          style={inputStyle}
-          value={s.imageFormat}
-          onChange={(e) => s.setImageFormat(e.target.value as "png" | "jpeg")}
-        >
-          <option value="png">PNG</option>
-          <option value="jpeg">JPEG</option>
-        </select>
-        <label style={labelStyle}>Recording Format</label>
-        <select
-          style={inputStyle}
-          value={s.recordFormat}
-          onChange={(e) => s.setRecordFormat(e.target.value as "mp4" | "gif")}
-        >
-          <option value="mp4">MP4</option>
-          <option value="gif">GIF</option>
-        </select>
-      </div>
+      <OutputSection
+        saveDirectory={s.saveDirectory}
+        setSaveDirectory={s.setSaveDirectory}
+        imageFormat={s.imageFormat}
+        setImageFormat={s.setImageFormat}
+        recordFormat={s.recordFormat}
+        setRecordFormat={s.setRecordFormat}
+      />
       <div style={section}>
         <div style={sectionTitle}>
           <Monitor size={15} /> System
@@ -84,7 +71,13 @@ export function SettingsWindow() {
         <HotkeyConfig />
       </div>
       <button onClick={onSave} style={{ ...btnPrimary, width: "100%", justifyContent: "center" }}>
-        Save
+        {saved ? (
+          <>
+            <Check size={14} /> Saved!
+          </>
+        ) : (
+          "Save"
+        )}
       </button>
     </div>
   );

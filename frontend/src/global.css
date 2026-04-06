@@ -65,3 +65,17 @@ select:focus-visible {
     opacity: 0.5;
   }
 }
+
+@keyframes pulse-border {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 71, 87, 0.1);
+  }
+}
+
+.view-transition {
+  animation: fadeIn 0.2s ease;
+}
