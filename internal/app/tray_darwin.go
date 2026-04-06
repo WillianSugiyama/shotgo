@@ -2,9 +2,10 @@
 
 package app
 
+// #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
-// void SetupTray(void);
-// void RemoveTray(void);
+// void SGSetupTray(void);
+// void SGRemoveTray(void);
 import "C"
 
 //export goTrayCallback
@@ -13,9 +14,9 @@ func goTrayCallback(action C.int) {
 }
 
 func setupNativeTray() {
-	C.SetupTray()
+	C.SGSetupTray()
 }
 
 func removeNativeTray() {
-	C.RemoveTray()
+	C.SGRemoveTray()
 }

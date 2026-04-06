@@ -1,48 +1,51 @@
 #import <Cocoa/Cocoa.h>
+#include <stdio.h>
+#include "_cgo_export.h"
 
-extern void goTrayCallback(int action);
-
-@interface TrayDelegate : NSObject
+@interface SGTrayDelegate : NSObject
 @end
 
-@implementation TrayDelegate
+@implementation SGTrayDelegate
 - (void)menuAction:(NSMenuItem *)sender {
     goTrayCallback((int)sender.tag);
 }
 @end
 
-static NSStatusItem *_item = nil;
-static TrayDelegate *_del = nil;
+static NSStatusItem *_sgItem = nil;
+static SGTrayDelegate *_sgDel = nil;
 
-static void addItem(NSMenu *m, NSString *t, int tag, NSString *ke) {
-    NSMenuItem *i = [[NSMenuItem alloc] initWithTitle:t
-        action:@selector(menuAction:) keyEquivalent:ke];
-    i.tag = tag;
-    i.target = _del;
-    [m addItem:i];
-}
-
-void SetupTray(void) {
+void SGSetupTray(void) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        _del = [[TrayDelegate alloc] init];
-        _item = [[NSStatusBar systemStatusBar]
+        _sgDel = [[SGTrayDelegate alloc] init];
+        _sgItem = [[NSStatusBar systemStatusBar]
             statusItemWithLength:NSVariableStatusItemLength];
-        _item.button.title = @"SG";
+        _sgItem.button.title = @"SG";
         NSMenu *m = [[NSMenu alloc] init];
-        addItem(m, @"Capture Fullscreen", 1, @"");
-        addItem(m, @"Capture Region", 2, @"");
+
+        void (^add)(NSString *, int, NSString *) =
+            ^(NSString *t, int tag, NSString *ke) {
+            NSMenuItem *i = [[NSMenuItem alloc] initWithTitle:t
+                action:@selector(menuAction:) keyEquivalent:ke];
+            i.tag = tag;
+            i.target = _sgDel;
+            [m addItem:i];
+        };
+
+        add(@"Capture Fullscreen", 1, @"");
+        add(@"Capture Region", 2, @"");
         [m addItem:[NSMenuItem separatorItem]];
-        addItem(m, @"Record Screen", 3, @"");
+        add(@"Record Screen", 3, @"");
         [m addItem:[NSMenuItem separatorItem]];
-        addItem(m, @"Settings", 4, @",");
-        addItem(m, @"Quit", 5, @"q");
-        _item.menu = m;
+        add(@"Settings", 4, @",");
+        add(@"Quit ShotGo", 5, @"q");
+        _sgItem.menu = m;
+        fprintf(stderr, "[shotgo] tray icon created\n");
     });
 }
 
-void RemoveTray(void) {
-    if (_item) {
-        [[NSStatusBar systemStatusBar] removeStatusItem:_item];
-        _item = nil;
+void SGRemoveTray(void) {
+    if (_sgItem) {
+        [[NSStatusBar systemStatusBar] removeStatusItem:_sgItem];
+        _sgItem = nil;
     }
 }
