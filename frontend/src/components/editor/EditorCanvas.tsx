@@ -1,29 +1,15 @@
-import { useRef, useState, useCallback, useEffect } from "react";
-import { Toolbar, EditorTool } from "./Toolbar";
+import { useCallback } from "react";
+import { Toolbar } from "./Toolbar";
+import { InteractiveCanvas } from "./InteractiveCanvas";
 import { useAppStore } from "../../stores/appStore";
 import { useCaptureStore } from "../../stores/captureStore";
+import { useEditorTools } from "../../hooks/useEditorTools";
 import { CopyLastToClipboard, SaveLastScreenshot } from "../../../wailsjs/go/app/App";
 
 export function EditorCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeTool, setActiveTool] = useState<EditorTool>(null);
   const { setView } = useAppStore();
   const { imageData, reset } = useCaptureStore();
-
-  useEffect(() => {
-    if (!imageData || !canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-    };
-    img.src = imageData;
-  }, [imageData]);
+  const tools = useEditorTools();
 
   const handleSave = useCallback(async () => {
     try {
@@ -51,14 +37,19 @@ export function EditorCanvas() {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Toolbar
-        activeTool={activeTool}
-        onSelectTool={setActiveTool}
+        activeTool={tools.activeTool}
+        onSelectTool={tools.setActiveTool}
         onSave={handleSave}
         onCopy={handleCopy}
         onCancel={handleCancel}
       />
       <div style={{ flex: 1, overflow: "auto", background: "#0d0d1a" }}>
-        <canvas ref={canvasRef} style={{ display: "block", margin: "auto" }} />
+        <InteractiveCanvas
+          imageData={imageData}
+          annotations={tools.annotations}
+          onMouseDown={tools.handleMouseDown}
+          onMouseUp={tools.handleMouseUp}
+        />
       </div>
     </div>
   );
