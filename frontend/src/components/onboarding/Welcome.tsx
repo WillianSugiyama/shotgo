@@ -7,9 +7,6 @@ import {
   HideWindow,
 } from "../../../wailsjs/go/app/App";
 import { ArrowRight } from "lucide-react";
-import { color, space } from "../../styles/tokens";
-import { btnPrimary } from "../../styles/buttons";
-import { centerScreen, heading, subtext } from "../../styles/layout";
 import { PermissionCard } from "./PermissionCard";
 
 export function Welcome() {
@@ -64,16 +61,14 @@ export function Welcome() {
 
   const handleContinue = () => {
     setFirstLaunch(false);
-    if (screenOk) {
-      HideWindow().catch(() => {});
-    }
+    if (screenOk) HideWindow().catch(() => {});
     setView("idle");
   };
 
   return (
-    <div style={centerScreen} className="view-transition">
-      <h1 style={heading}>Welcome to ShotGo</h1>
-      <p style={{ ...subtext, margin: `${space.xs}px 0 0`, maxWidth: 300 }}>
+    <div className="view-transition flex flex-col items-center justify-center min-h-screen bg-bg p-8">
+      <h1 className="text-[22px] font-semibold text-text">Welcome to ShotGo</h1>
+      <p className="text-[13px] text-text-muted mt-1 max-w-[300px]">
         A fast, lightweight screenshot and recording tool.
       </p>
       {!checking && (
@@ -85,8 +80,8 @@ export function Welcome() {
           onRecheck={check}
         />
       )}
-      {checking && <p style={{ color: color.textMuted, fontSize: 12 }}>Checking permissions...</p>}
-      <button onClick={handleContinue} style={{ ...btnPrimary, marginTop: space.lg }}>
+      {checking && <p className="text-text-muted text-xs">Checking permissions...</p>}
+      <button onClick={handleContinue} className="btn-primary mt-6">
         {screenOk ? "Get Started" : "Continue anyway"} <ArrowRight size={14} />
       </button>
     </div>

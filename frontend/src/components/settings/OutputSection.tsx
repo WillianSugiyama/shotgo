@@ -1,5 +1,4 @@
 import { FolderOpen } from "lucide-react";
-import { section, sectionTitle, inputStyle, labelStyle } from "./settingsStyles";
 
 interface Props {
   saveDirectory: string;
@@ -12,28 +11,28 @@ interface Props {
 
 export function OutputSection(p: Props) {
   return (
-    <div style={section}>
-      <div style={sectionTitle}>
+    <div className="p-4 mb-4 bg-surface rounded-lg border border-border">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-text-muted uppercase tracking-wider mb-4">
         <FolderOpen size={15} /> Output
       </div>
-      <label style={labelStyle}>Save Directory</label>
+      <label className="block text-[13px] text-text-muted mb-1">Save Directory</label>
       <input
-        style={inputStyle}
+        className="settings-input"
         value={p.saveDirectory}
         onChange={(e) => p.setSaveDirectory(e.target.value)}
       />
-      <label style={labelStyle}>Image Format</label>
+      <label className="block text-[13px] text-text-muted mb-1">Image Format</label>
       <select
-        style={inputStyle}
+        className="settings-input"
         value={p.imageFormat}
         onChange={(e) => p.setImageFormat(e.target.value as "png" | "jpeg")}
       >
         <option value="png">PNG</option>
         <option value="jpeg">JPEG</option>
       </select>
-      <label style={labelStyle}>Recording Format</label>
+      <label className="block text-[13px] text-text-muted mb-1">Recording Format</label>
       <select
-        style={inputStyle}
+        className="settings-input"
         value={p.recordFormat}
         onChange={(e) => p.setRecordFormat(e.target.value as "mp4" | "gif")}
       >

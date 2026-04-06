@@ -6,22 +6,17 @@ interface PermissionItemProps {
 
 function PermissionItem({ name, status, onRequest }: PermissionItemProps) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12 }}>
+    <div className="flex items-center gap-3 p-3">
       <span
-        style={{
-          width: 10,
-          height: 10,
-          borderRadius: "50%",
-          background: status === "granted" ? "#2ecc71" : "#e74c3c",
-        }}
+        className={`w-2.5 h-2.5 rounded-full ${status === "granted" ? "bg-success" : "bg-danger"}`}
       />
-      <span style={{ flex: 1, color: "#fff" }}>{name}</span>
+      <span className="flex-1 text-text">{name}</span>
       {status !== "granted" && (
-        <button onClick={onRequest} style={btnStyle}>
+        <button onClick={onRequest} className="btn-primary px-3 py-1 text-xs">
           Grant
         </button>
       )}
-      {status === "granted" && <span style={{ color: "#2ecc71" }}>OK</span>}
+      {status === "granted" && <span className="text-success">OK</span>}
     </div>
   );
 }
@@ -35,9 +30,9 @@ interface Props {
 
 export function PermissionsGuide(props: Props) {
   return (
-    <div style={{ padding: 24, maxWidth: 400, margin: "0 auto" }}>
-      <h2 style={{ color: "#fff" }}>Permissions Required</h2>
-      <p style={{ color: "#aaa" }}>ShotGo needs these permissions to capture your screen.</p>
+    <div className="p-6 max-w-[400px] mx-auto">
+      <h2 className="text-text">Permissions Required</h2>
+      <p className="text-text-muted">ShotGo needs these permissions to capture your screen.</p>
       <PermissionItem
         name="Screen Recording"
         status={props.screenCapture}
@@ -51,12 +46,3 @@ export function PermissionsGuide(props: Props) {
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  padding: "4px 12px",
-  background: "#4A90D9",
-  color: "#fff",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-};

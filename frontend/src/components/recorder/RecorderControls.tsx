@@ -1,20 +1,8 @@
 import { ArrowLeft, Pause, Play, Square } from "lucide-react";
 import { useRecording } from "../../hooks/useRecording";
 import { useAppStore } from "../../stores/appStore";
-import { space } from "../../styles/tokens";
-import { btnDanger, btnSecondary } from "../../styles/buttons";
 import { SourcePicker } from "./SourcePicker";
 import { RecordingPreview } from "./RecordingPreview";
-import {
-  recContainer,
-  timerText,
-  recRow,
-  recDot,
-  recBox,
-  timerRow,
-  timerSub,
-  backBtnStyle,
-} from "./recorderStyles";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -24,22 +12,24 @@ function formatTime(seconds: number): string {
   return `${m}:${s}`;
 }
 
-const pulseCSS = "@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}";
-
 export function RecorderControls() {
   const { state, elapsedSeconds, maxSeconds, start, stop, pause, resume } = useRecording();
   const { setView } = useAppStore();
   const isRec = state === "recording";
 
   const backBtn = (
-    <button title="Back" onClick={() => setView("idle")} style={backBtnStyle}>
+    <button
+      title="Back"
+      onClick={() => setView("idle")}
+      className="btn-ghost absolute top-4 left-4"
+    >
       <ArrowLeft size={18} /> Back
     </button>
   );
 
   if (state === "idle") {
     return (
-      <div style={recContainer}>
+      <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
         {backBtn}
         <SourcePicker onSelect={(src) => start(src)} />
       </div>
@@ -48,7 +38,7 @@ export function RecorderControls() {
 
   if (state === "stopped") {
     return (
-      <div style={recContainer}>
+      <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
         {backBtn}
         <RecordingPreview />
       </div>
@@ -56,33 +46,36 @@ export function RecorderControls() {
   }
 
   return (
-    <div style={recContainer}>
-      <style>{pulseCSS}</style>
+    <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
       {backBtn}
-      <div style={isRec ? recBox : { padding: space.lg }}>
-        <div style={timerRow}>
-          {isRec && <span style={recDot} />}
-          <span style={timerText}>{formatTime(elapsedSeconds)}</span>
-          <span style={timerSub}>/ {formatTime(maxSeconds)}</span>
+      <div className={isRec ? "rounded-lg border-2 border-recording p-6 bg-recording/5" : "p-6"}>
+        <div className="flex items-center gap-2 justify-center">
+          {isRec && (
+            <span className="w-3 h-3 rounded-full bg-recording animate-[pulse-dot_1s_ease-in-out_infinite]" />
+          )}
+          <span className="font-mono text-5xl font-bold text-text tracking-wider">
+            {formatTime(elapsedSeconds)}
+          </span>
+          <span className="text-text-muted text-base font-mono">/ {formatTime(maxSeconds)}</span>
         </div>
       </div>
-      <div style={recRow}>
+      <div className="flex items-center gap-4">
         {isRec && (
           <>
-            <button onClick={pause} style={btnSecondary}>
+            <button onClick={pause} className="btn-secondary">
               <Pause size={16} /> Pause
             </button>
-            <button onClick={stop} style={btnDanger}>
+            <button onClick={stop} className="btn-danger">
               <Square size={16} fill="white" /> Stop
             </button>
           </>
         )}
         {state === "paused" && (
           <>
-            <button onClick={resume} style={btnSecondary}>
+            <button onClick={resume} className="btn-secondary">
               <Play size={16} /> Resume
             </button>
-            <button onClick={stop} style={btnDanger}>
+            <button onClick={stop} className="btn-danger">
               <Square size={16} fill="white" /> Stop
             </button>
           </>

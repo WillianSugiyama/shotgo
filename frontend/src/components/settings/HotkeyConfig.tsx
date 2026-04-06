@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useSettings } from "../../hooks/useSettings";
 import { HotkeyBinding } from "../../stores/settingsStore";
-import { color, radius, space, font } from "../../styles/tokens";
 
 const actionLabels: Record<string, string> = {
   capture_fullscreen: "Fullscreen",
@@ -41,10 +40,11 @@ export function HotkeyConfig() {
   return (
     <div>
       {hotkeys.map((b) => (
-        <div key={b.action} style={row}>
-          <span style={{ fontSize: 13, color: color.text }}>
-            {actionLabels[b.action] ?? b.action}
-          </span>
+        <div
+          key={b.action}
+          className="flex justify-between items-center py-2 border-b border-border"
+        >
+          <span className="text-[13px] text-text">{actionLabels[b.action] ?? b.action}</span>
           {editing === b.action ? (
             <input
               autoFocus
@@ -52,44 +52,18 @@ export function HotkeyConfig() {
               onKeyDown={(e) => handleKeyDown(e, b.action)}
               onBlur={() => setEditing(null)}
               placeholder="Press keys..."
-              style={inputKbd}
+              className="hotkey-input outline-2 outline-accent w-[140px] text-center"
             />
           ) : (
-            <button onClick={() => setEditing(b.action)} style={kbd}>
+            <button onClick={() => setEditing(b.action)} className="hotkey-input">
               {[...b.modifiers, b.key].join(" + ")}
             </button>
           )}
         </div>
       ))}
-      <p style={{ fontSize: 11, color: color.textMuted, marginTop: space.sm }}>
+      <p className="text-[11px] text-text-muted mt-2">
         Click a shortcut to re-bind. Press Escape to cancel.
       </p>
     </div>
   );
 }
-
-const row: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: `${space.sm}px 0`,
-  borderBottom: `1px solid ${color.border}`,
-};
-
-const kbd: React.CSSProperties = {
-  padding: "4px 12px",
-  fontSize: 12,
-  fontFamily: font.mono,
-  background: color.bg,
-  border: `1px solid ${color.border}`,
-  borderRadius: radius.sm,
-  color: color.text,
-  cursor: "pointer",
-};
-
-const inputKbd: React.CSSProperties = {
-  ...kbd,
-  outline: `2px solid ${color.accent}`,
-  width: 140,
-  textAlign: "center",
-};

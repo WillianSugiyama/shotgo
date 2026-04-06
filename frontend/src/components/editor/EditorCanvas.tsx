@@ -6,7 +6,6 @@ import { useCaptureStore } from "../../stores/captureStore";
 import { useEditorTools } from "../../hooks/useEditorTools";
 import { useToastStore } from "../../stores/toastStore";
 import { CopyLastToClipboard, SaveLastScreenshot } from "../../../wailsjs/go/app/App";
-import { color } from "../../styles/tokens";
 
 export function EditorCanvas() {
   const { setView } = useAppStore();
@@ -18,7 +17,7 @@ export function EditorCanvas() {
     try {
       await SaveLastScreenshot("");
       toast("Screenshot saved", "success");
-    } catch (err) {
+    } catch {
       toast("Save failed", "error");
     }
     reset();
@@ -29,7 +28,7 @@ export function EditorCanvas() {
     try {
       await CopyLastToClipboard();
       toast("Copied to clipboard", "success");
-    } catch (err) {
+    } catch {
       toast("Copy failed", "error");
     }
   }, [toast]);
@@ -40,7 +39,7 @@ export function EditorCanvas() {
   }, [reset, setView]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <div className="flex flex-col h-screen">
       <Toolbar
         activeTool={tools.activeTool}
         onSelectTool={tools.setActiveTool}
@@ -49,7 +48,7 @@ export function EditorCanvas() {
         onCopy={handleCopy}
         onCancel={handleCancel}
       />
-      <div style={{ flex: 1, overflow: "auto", background: color.bg }}>
+      <div className="flex-1 overflow-auto bg-bg">
         <InteractiveCanvas
           imageData={imageData}
           annotations={tools.annotations}

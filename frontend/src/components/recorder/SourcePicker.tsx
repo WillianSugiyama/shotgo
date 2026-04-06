@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { Monitor, Play } from "lucide-react";
 import { ListRecordingSources, CapturePreview } from "../../../wailsjs/go/app/App";
 import type { SelectedSource } from "../../stores/recordingStore";
-import { color } from "../../styles/tokens";
-import { btnPrimary } from "../../styles/buttons";
-import { pickerWrap, selectStyle, thumbStyle, placeholder } from "./sourcePickerStyles";
 
 interface Source {
   type: "screen" | "window";
@@ -46,18 +43,18 @@ export function SourcePicker({ onSelect }: Props) {
   }, [selected]);
 
   return (
-    <div style={pickerWrap}>
+    <div className="flex flex-col items-center gap-4">
       {thumb ? (
-        <img src={thumb} alt="Preview" style={thumbStyle} />
+        <img src={thumb} alt="Preview" className="max-w-[280px] rounded-md border border-border" />
       ) : (
-        <div style={placeholder}>
-          <Monitor size={32} color={color.textMuted} />
+        <div className="w-[280px] h-[160px] flex items-center justify-center bg-surface rounded-md border border-border">
+          <Monitor size={32} className="text-text-muted" />
         </div>
       )}
       <select
         value={selected}
         onChange={(e) => setSelected(Number(e.target.value))}
-        style={selectStyle}
+        className="w-[280px] px-4 py-2 text-sm font-body bg-surface text-text border border-border rounded-md cursor-pointer"
       >
         {sources.map((s, i) => (
           <option key={s.id + s.type} value={i}>
@@ -65,10 +62,7 @@ export function SourcePicker({ onSelect }: Props) {
           </option>
         ))}
       </select>
-      <button
-        onClick={() => onSelect(sources[selected])}
-        style={{ ...btnPrimary, padding: "12px 32px" }}
-      >
+      <button onClick={() => onSelect(sources[selected])} className="btn-primary px-8 py-3">
         <Play size={16} fill="white" /> Start Recording
       </button>
     </div>

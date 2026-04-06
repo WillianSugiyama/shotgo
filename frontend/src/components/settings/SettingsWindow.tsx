@@ -2,18 +2,8 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Monitor, Keyboard, Check } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { useAppStore } from "../../stores/appStore";
-import { btnPrimary, btnGhost } from "../../styles/buttons";
-import { color } from "../../styles/tokens";
 import { HotkeyConfig } from "./HotkeyConfig";
 import { OutputSection } from "./OutputSection";
-import { container, header, section, sectionTitle, checkboxLabel } from "./settingsStyles";
-
-const backBtn: React.CSSProperties = {
-  ...btnGhost,
-  color: color.text,
-  fontSize: 14,
-  fontWeight: 500,
-};
 
 export function SettingsWindow() {
   const { setView } = useAppStore();
@@ -34,14 +24,14 @@ export function SettingsWindow() {
   };
 
   return (
-    <div style={container} className="view-transition">
-      <div style={header}>
-        <button onClick={() => setView("idle")} style={backBtn}>
+    <div className="view-transition p-6 text-text max-w-[520px] mx-auto overflow-y-auto max-h-screen animate-[fadeIn_0.2s_ease]">
+      <div className="flex items-center gap-2 mb-6">
+        <button onClick={() => setView("idle")} className="btn-ghost text-text text-sm font-medium">
           <ArrowLeft size={18} /> Back
         </button>
-        <div style={{ flex: 1 }} />
-        <h2 style={{ fontSize: 20, fontWeight: 600, color: color.text }}>Settings</h2>
-        <div style={{ flex: 1 }} />
+        <div className="flex-1" />
+        <h2 className="text-xl font-semibold text-text">Settings</h2>
+        <div className="flex-1" />
       </div>
       <OutputSection
         saveDirectory={s.saveDirectory}
@@ -51,11 +41,8 @@ export function SettingsWindow() {
         recordFormat={s.recordFormat}
         setRecordFormat={s.setRecordFormat}
       />
-      <div style={section}>
-        <div style={sectionTitle}>
-          <Monitor size={15} /> System
-        </div>
-        <label style={checkboxLabel}>
+      <Section title="System" icon={<Monitor size={15} />}>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={s.launchAtStartup}
@@ -63,14 +50,11 @@ export function SettingsWindow() {
           />
           Launch at startup
         </label>
-      </div>
-      <div style={section}>
-        <div style={sectionTitle}>
-          <Keyboard size={15} /> Hotkeys
-        </div>
+      </Section>
+      <Section title="Hotkeys" icon={<Keyboard size={15} />}>
         <HotkeyConfig />
-      </div>
-      <button onClick={onSave} style={{ ...btnPrimary, width: "100%", justifyContent: "center" }}>
+      </Section>
+      <button onClick={onSave} className="btn-primary w-full justify-center">
         {saved ? (
           <>
             <Check size={14} /> Saved!
@@ -79,6 +63,25 @@ export function SettingsWindow() {
           "Save"
         )}
       </button>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="p-4 mb-4 bg-surface rounded-lg border border-border">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-text-muted uppercase tracking-wider mb-4">
+        {icon} {title}
+      </div>
+      {children}
     </div>
   );
 }

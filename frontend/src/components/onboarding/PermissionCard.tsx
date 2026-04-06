@@ -1,7 +1,4 @@
 import { Shield, CheckCircle, AlertTriangle, RefreshCw } from "lucide-react";
-import { color, space } from "../../styles/tokens";
-import { btnPrimary, btnSecondary, btnGhost } from "../../styles/buttons";
-import { card, rowCenter, label } from "../../styles/layout";
 
 interface Props {
   screenOk: boolean;
@@ -11,20 +8,13 @@ interface Props {
   onRecheck: () => void;
 }
 
-const hint: React.CSSProperties = {
-  fontSize: 12,
-  color: color.textMuted,
-  margin: `0 0 ${space.md}px`,
-  lineHeight: 1.5,
-};
-
 export function PermissionCard(p: Props) {
   const icon = p.screenOk ? (
-    <CheckCircle size={20} color={color.success} />
+    <CheckCircle size={20} className="text-success" />
   ) : p.checkFailed ? (
-    <AlertTriangle size={20} color={color.warning} />
+    <AlertTriangle size={20} className="text-warning" />
   ) : (
-    <Shield size={20} color={color.accent} />
+    <Shield size={20} className="text-accent" />
   );
 
   const title = p.screenOk
@@ -34,37 +24,37 @@ export function PermissionCard(p: Props) {
       : "Screen Recording Access";
 
   return (
-    <div style={card}>
-      <div style={{ ...rowCenter, alignItems: "center", marginBottom: space.md }}>
+    <div className="bg-surface border border-border rounded-lg p-6 max-w-[340px] w-full mt-6 text-center">
+      <div className="flex gap-2 items-center justify-center mb-4">
         {icon}
-        <span style={label}>{title}</span>
+        <span className="text-sm font-medium text-text">{title}</span>
       </div>
       {p.checkFailed && (
-        <p style={hint}>
+        <p className="text-xs text-text-muted mb-4 leading-relaxed">
           Permission check unavailable. You can continue and grant access later from System
           Settings.
         </p>
       )}
       {!p.screenOk && !p.checkFailed && (
         <>
-          <p style={hint}>ShotGo needs screen recording access to capture your screen.</p>
-          <div style={rowCenter}>
-            <button onClick={p.onRequest} style={btnPrimary}>
+          <p className="text-xs text-text-muted mb-4 leading-relaxed">
+            ShotGo needs screen recording access to capture your screen.
+          </p>
+          <div className="flex gap-2 flex-wrap justify-center">
+            <button onClick={p.onRequest} className="btn-primary">
               Grant Access
             </button>
-            <button onClick={p.onOpenSettings} style={btnSecondary}>
+            <button onClick={p.onOpenSettings} className="btn-secondary">
               Open Settings
             </button>
-            <button onClick={p.onRecheck} style={btnGhost}>
+            <button onClick={p.onRecheck} className="btn-ghost">
               <RefreshCw size={13} /> Re-check
             </button>
           </div>
         </>
       )}
       {p.screenOk && (
-        <p style={{ fontSize: 12, color: color.success, margin: 0 }}>
-          You're all set. Screen recording is enabled.
-        </p>
+        <p className="text-xs text-success">You're all set. Screen recording is enabled.</p>
       )}
     </div>
   );

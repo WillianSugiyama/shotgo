@@ -1,8 +1,6 @@
 import { Play, FolderOpen, RefreshCw } from "lucide-react";
 import { OpenFile, RevealFile } from "../../../wailsjs/go/app/App";
 import { useRecordingStore } from "../../stores/recordingStore";
-import { color, font, radius, space } from "../../styles/tokens";
-import { btnPrimary, btnSecondary } from "../../styles/buttons";
 
 export function RecordingPreview() {
   const outputPath = useRecordingStore((s) => s.outputPath);
@@ -13,66 +11,28 @@ export function RecordingPreview() {
   const filename = outputPath.split("/").pop() ?? outputPath;
 
   return (
-    <div style={container}>
-      <p style={titleStyle}>Recording Complete</p>
-      <p style={pathStyle} title={outputPath}>
+    <div className="flex flex-col items-center gap-4">
+      <p className="text-lg font-semibold text-success">Recording Complete</p>
+      <p
+        className="text-[13px] font-mono text-text-muted bg-surface px-4 py-2 rounded-md max-w-[280px] overflow-hidden text-ellipsis whitespace-nowrap"
+        title={outputPath}
+      >
         {filename}
       </p>
-      <div style={btnRow}>
-        <button onClick={() => OpenFile(outputPath)} style={btnPrimary}>
+      <div className="flex gap-2 mt-2">
+        <button onClick={() => OpenFile(outputPath)} className="btn-primary">
           <Play size={16} /> Open File
         </button>
-        <button onClick={() => RevealFile(outputPath)} style={btnSecondary}>
+        <button onClick={() => RevealFile(outputPath)} className="btn-secondary">
           <FolderOpen size={16} /> Show in Finder
         </button>
       </div>
-      <button onClick={reset} style={newRecBtn}>
+      <button
+        onClick={reset}
+        className="inline-flex items-center gap-1.5 text-[13px] text-text-muted mt-2 bg-transparent border-none cursor-pointer"
+      >
         <RefreshCw size={14} /> New Recording
       </button>
     </div>
   );
 }
-
-const container: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: space.md,
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: 18,
-  fontWeight: 600,
-  color: color.success,
-};
-
-const pathStyle: React.CSSProperties = {
-  fontSize: 13,
-  fontFamily: font.mono,
-  color: color.textMuted,
-  background: color.surface,
-  padding: `${space.sm}px ${space.md}px`,
-  borderRadius: radius.md,
-  maxWidth: 280,
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-};
-
-const btnRow: React.CSSProperties = {
-  display: "flex",
-  gap: space.sm,
-  marginTop: space.sm,
-};
-
-const newRecBtn: React.CSSProperties = {
-  background: "transparent",
-  border: "none",
-  color: color.textMuted,
-  cursor: "pointer",
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  fontSize: 13,
-  marginTop: space.sm,
-};

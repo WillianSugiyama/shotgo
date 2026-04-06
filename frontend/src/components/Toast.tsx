@@ -1,10 +1,9 @@
 import { useToastStore } from "../stores/toastStore";
-import { color, radius, space } from "../styles/tokens";
 
-const typeColors = {
-  success: color.success,
-  error: color.danger,
-  info: color.accent,
+const borderColors = {
+  success: "border-l-success",
+  error: "border-l-danger",
+  info: "border-l-accent",
 };
 
 export function ToastContainer() {
@@ -12,32 +11,12 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: space.lg,
-        right: space.lg,
-        zIndex: 10000,
-        display: "flex",
-        flexDirection: "column",
-        gap: space.sm,
-      }}
-    >
+    <div className="fixed bottom-6 right-6 z-[10000] flex flex-col gap-2">
       {toasts.map((t) => (
         <div
           key={t.id}
           onClick={() => dismiss(t.id)}
-          style={{
-            padding: `${space.sm}px ${space.md}px`,
-            background: color.surface,
-            borderLeft: `3px solid ${typeColors[t.type]}`,
-            borderRadius: radius.sm,
-            color: color.text,
-            fontSize: 13,
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-            animation: "fadeIn 0.2s ease",
-          }}
+          className={`px-4 py-2 bg-surface border-l-[3px] ${borderColors[t.type]} rounded-sm text-text text-[13px] cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)] animate-[fadeIn_0.2s_ease]`}
         >
           {t.message}
         </div>

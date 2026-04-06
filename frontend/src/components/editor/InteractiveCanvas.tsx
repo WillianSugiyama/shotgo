@@ -58,7 +58,7 @@ export function InteractiveCanvas({ imageData, annotations, onMouseDown, onMouse
   return (
     <canvas
       ref={canvasRef}
-      style={{ display: "block", margin: "auto", cursor: "crosshair" }}
+      className="block mx-auto cursor-crosshair"
       onMouseDown={(e) => {
         const p = getPos(e);
         onMouseDown(p.x, p.y);

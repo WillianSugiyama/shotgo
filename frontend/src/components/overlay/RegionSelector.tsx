@@ -64,18 +64,11 @@ export function RegionSelector({ onSelect, onCancel }: Props) {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onKeyDown={handleKeyDown}
-      style={{ position: "fixed", inset: 0 }}
+      className="fixed inset-0"
       autoFocus
     >
       {rect && (
-        <div
-          style={{
-            position: "absolute",
-            border: "2px solid #4A90D9",
-            background: "rgba(74, 144, 217, 0.1)",
-            ...rect,
-          }}
-        />
+        <div className="absolute border-2 border-selection bg-selection-subtle" style={rect} />
       )}
     </div>
   );

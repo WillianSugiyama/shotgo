@@ -14,15 +14,7 @@ export function SelectionOverlay() {
   }, [cancelCapture]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0, 0, 0, 0.3)",
-        cursor: "crosshair",
-        zIndex: 9999,
-      }}
-    >
+    <div className="fixed inset-0 bg-black/30 cursor-crosshair z-[9999]">
       <RegionSelector onSelect={handleSelect} onCancel={handleCancel} />
     </div>
   );
