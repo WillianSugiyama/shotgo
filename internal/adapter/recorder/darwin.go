@@ -16,6 +16,7 @@ import (
 
 type DarwinRecorder struct {
 	mu                sync.Mutex
+	ffmpegPath        string
 	cmd               *exec.Cmd
 	stdin             io.WriteCloser
 	recording, paused bool
@@ -24,7 +25,9 @@ type DarwinRecorder struct {
 	startTime         time.Time
 }
 
-func NewDarwinRecorder() *DarwinRecorder { return &DarwinRecorder{} }
+func NewDarwinRecorder(ffmpegPath string) *DarwinRecorder {
+	return &DarwinRecorder{ffmpegPath: ffmpegPath}
+}
 
 func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat) error {
 	r.mu.Lock()
@@ -45,7 +48,7 @@ func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat
 	}
 	_ = input // TODO: use region params in ffmpeg args
 
-	r.cmd = exec.Command("ffmpeg", "-y",
+	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "avfoundation", "-framerate", "30",
 		"-capture_cursor", "1", "-i", "1:none",
 		"-c:v", "libx264", "-preset", "ultrafast",

@@ -22,14 +22,18 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
       - name: Install frontend deps
         run: cd frontend && npm ci
+      - name: Download ffmpeg
+        run: bash scripts/download-ffmpeg.sh darwin
+      - name: Prepare ffmpeg embed
+        run: bash scripts/prepare-ffmpeg-embed.sh darwin
       - name: Build universal binary
-        run: wails build -platform darwin/universal
+        run: wails build -platform darwin/universal -tags embedffmpeg
       - name: Create DMG
         run: |
           hdiutil create -volname "ShotGo" \
             -srcfolder build/bin/ShotGo.app \
             -ov -format UDZO "build/bin/ShotGo-macOS-universal.dmg"
-      - name: Upload artifacts
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: macos-universal
@@ -47,24 +51,23 @@ jobs:
           node-version: "20"
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - name: Install NSIS
-        run: choco install nsis -y
       - name: Install frontend deps
         run: cd frontend && npm ci
+      - name: Download ffmpeg
+        run: bash scripts/download-ffmpeg.sh windows
+        shell: bash
+      - name: Prepare ffmpeg embed
+        run: bash scripts/prepare-ffmpeg-embed.sh windows
+        shell: bash
       - name: Build amd64
-        run: wails build -platform windows/amd64 -nsis
-      - name: Rename installer
-        run: |
-          Copy-Item "build\bin\shotgo-amd64-installer.exe" `
-            "build\bin\ShotGo-Windows-x64-Setup.exe" -ErrorAction SilentlyContinue
-          if (!(Test-Path "build\bin\ShotGo-Windows-x64-Setup.exe")) {
-            Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-x64.exe"
-          }
-      - name: Upload artifacts
+        run: wails build -platform windows/amd64 -tags embedffmpeg
+      - name: Rename
+        run: Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-x64.exe"
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: windows-x64
-          path: build/bin/ShotGo-Windows-x64*.exe
+          path: build/bin/ShotGo-Windows-x64.exe
 
   release-windows-arm64:
     runs-on: windows-latest
@@ -80,12 +83,17 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
       - name: Install frontend deps
         run: cd frontend && npm ci
+      - name: Download ffmpeg
+        run: bash scripts/download-ffmpeg.sh windows
+        shell: bash
+      - name: Prepare ffmpeg embed
+        run: bash scripts/prepare-ffmpeg-embed.sh windows
+        shell: bash
       - name: Build arm64
-        run: wails build -platform windows/arm64
-      - name: Rename binary
-        run: |
-          Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-arm64.exe"
-      - name: Upload artifacts
+        run: wails build -platform windows/arm64 -tags embedffmpeg
+      - name: Rename
+        run: Copy-Item "build\bin\shotgo.exe" "build\bin\ShotGo-Windows-arm64.exe"
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: windows-arm64
@@ -99,8 +107,6 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
-      - name: List artifacts
-        run: find artifacts -type f
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

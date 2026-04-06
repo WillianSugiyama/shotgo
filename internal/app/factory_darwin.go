@@ -16,13 +16,13 @@ import (
 // New creates a new App with macOS-specific adapters.
 func New() *App {
 	capturer := capture.NewDarwinCapturer()
-	rec := recorder.NewDarwinRecorder()
+	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
+	rec := recorder.NewDarwinRecorder(ffmpegPath)
 	clip := clipboard.NewDarwinClipboard()
 	hotkeyMgr := hotkey.NewDarwinHotkeyManager()
 	perms := permissions.NewDarwinPermissions()
 	fileStore := storage.NewLocalFileStorage("")
 	configStore, _ := storage.NewJSONConfigStore("")
-	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
 	ffmpegClient := ffmpeg.NewClient(ffmpegPath)
 
 	return &App{

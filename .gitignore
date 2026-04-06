@@ -32,6 +32,7 @@ Thumbs.db
 
 # Embedded binaries
 build/embedded/ffmpeg*
+internal/infrastructure/ffmpeg/ffmpeg-bin
 
 # Docs (ADRs are local reference only)
 docs/

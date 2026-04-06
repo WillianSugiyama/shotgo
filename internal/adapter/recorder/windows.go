@@ -16,6 +16,7 @@ import (
 
 type WindowsRecorder struct {
 	mu                sync.Mutex
+	ffmpegPath        string
 	cmd               *exec.Cmd
 	stdin             io.WriteCloser
 	recording, paused bool
@@ -24,7 +25,9 @@ type WindowsRecorder struct {
 	startTime         time.Time
 }
 
-func NewWindowsRecorder() *WindowsRecorder { return &WindowsRecorder{} }
+func NewWindowsRecorder(ffmpegPath string) *WindowsRecorder {
+	return &WindowsRecorder{ffmpegPath: ffmpegPath}
+}
 
 func (r *WindowsRecorder) Start(_ *entity.Region, format entity.OutputFormat) error {
 	r.mu.Lock()
@@ -37,7 +40,7 @@ func (r *WindowsRecorder) Start(_ *entity.Region, format entity.OutputFormat) er
 	r.outPath = filepath.Join(os.TempDir(),
 		fmt.Sprintf("shotgo-rec-%d.mp4", time.Now().UnixNano()))
 
-	r.cmd = exec.Command("ffmpeg", "-y",
+	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "gdigrab", "-framerate", "30", "-i", "desktop",
 		"-c:v", "libx264", "-preset", "ultrafast",
 		"-pix_fmt", "yuv420p", r.outPath)

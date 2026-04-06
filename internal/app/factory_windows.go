@@ -3,6 +3,8 @@
 package app
 
 import (
+	"os"
+
 	"shotgo/internal/adapter/capture"
 	"shotgo/internal/adapter/clipboard"
 	"shotgo/internal/adapter/hotkey"
@@ -16,13 +18,13 @@ import (
 // New creates a new App with Windows-specific adapters.
 func New() *App {
 	capturer := capture.NewWindowsCapturer()
-	rec := recorder.NewWindowsRecorder()
+	ffmpegPath, _ := ffmpeg.ExtractBinary(os.TempDir() + "/shotgo")
+	rec := recorder.NewWindowsRecorder(ffmpegPath)
 	clip := clipboard.NewWindowsClipboard()
 	hotkeyMgr := hotkey.NewWindowsHotkeyManager()
 	perms := permissions.NewWindowsPermissions()
 	fileStore := storage.NewLocalFileStorage("")
 	configStore, _ := storage.NewJSONConfigStore("")
-	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
 	ffmpegClient := ffmpeg.NewClient(ffmpegPath)
 
 	return &App{
