@@ -11,30 +11,29 @@ import (
 
 // StartRecording begins a screen recording session.
 func (a *App) StartRecording(format string) error {
-	outputFormat := entity.OutputFormat(format)
-	return a.startRecording.Execute(nil, outputFormat)
+	return a.startRecording.Execute(nil, entity.OutputFormat(format))
 }
 
-// StartRecordingRegion begins recording a specific region.
-func (a *App) StartRecordingRegion(x, y, w, h int, format string) error {
-	region := &entity.Region{X: x, Y: y, Width: w, Height: h}
-	return a.startRecording.Execute(region, entity.OutputFormat(format))
-}
-
-// StopRecording signals stop and processes in background.
-// Emits "recording:done" event when the file is ready.
+// StopRecording signals stop, converts if needed, emits "recording:done".
 func (a *App) StopRecording() error {
 	go func() {
 		rec, err := a.stopRecording.Execute()
 		if err != nil {
-			log.Printf("[shotgo] stop recording error: %v", err)
+			log.Printf("[shotgo] stop error: %v", err)
 			wailsRuntime.EventsEmit(a.ctx, "recording:error", err.Error())
 			return
 		}
-		log.Printf("[shotgo] recording stopped: %s", rec.OutputPath)
+		finalPath := rec.OutputPath
+		if rec.Format == entity.FormatGIF {
+			gifPath := finalPath + ".gif"
+			if e := a.ffmpegClient.EncodeGIF(finalPath, gifPath, 15, 640); e == nil {
+				finalPath = gifPath
+			}
+		}
+		log.Printf("[shotgo] recording saved: %s", finalPath)
 		wailsRuntime.EventsEmit(a.ctx, "recording:done", RecordingResult{
 			ID: rec.ID, Format: string(rec.Format),
-			Duration: rec.Duration.Seconds(), OutputPath: rec.OutputPath,
+			Duration: rec.Duration.Seconds(), OutputPath: finalPath,
 		})
 	}()
 	return nil

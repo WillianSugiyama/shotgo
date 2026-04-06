@@ -4,6 +4,7 @@ import { useAppStore } from "../../stores/appStore";
 import { space } from "../../styles/tokens";
 import { btnDanger, btnSecondary } from "../../styles/buttons";
 import { SourcePicker } from "./SourcePicker";
+import { RecordingPreview } from "./RecordingPreview";
 import {
   recContainer,
   timerText,
@@ -41,6 +42,15 @@ export function RecorderControls() {
       <div style={recContainer}>
         {backBtn}
         <SourcePicker onSelect={(src) => start(src)} />
+      </div>
+    );
+  }
+
+  if (state === "stopped") {
+    return (
+      <div style={recContainer}>
+        {backBtn}
+        <RecordingPreview />
       </div>
     );
   }

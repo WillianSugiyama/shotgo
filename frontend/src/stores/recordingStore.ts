@@ -15,10 +15,12 @@ interface RecordingStoreState {
   elapsedSeconds: number;
   maxSeconds: number;
   selectedSource: SelectedSource | null;
+  outputPath: string | null;
   setState: (state: RecordingState) => void;
   setFormat: (format: OutputFormat) => void;
   setElapsedSeconds: (seconds: number) => void;
   setSelectedSource: (source: SelectedSource | null) => void;
+  setOutputPath: (path: string | null) => void;
   reset: () => void;
 }
 
@@ -28,9 +30,11 @@ export const useRecordingStore = create<RecordingStoreState>((set) => ({
   elapsedSeconds: 0,
   maxSeconds: 300,
   selectedSource: null,
+  outputPath: null,
   setState: (state) => set({ state }),
   setFormat: (format) => set({ format }),
   setElapsedSeconds: (elapsedSeconds) => set({ elapsedSeconds }),
   setSelectedSource: (selectedSource) => set({ selectedSource }),
-  reset: () => set({ state: "idle", elapsedSeconds: 0, selectedSource: null }),
+  setOutputPath: (outputPath) => set({ outputPath }),
+  reset: () => set({ state: "idle", elapsedSeconds: 0, selectedSource: null, outputPath: null }),
 }));

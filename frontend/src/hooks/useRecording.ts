@@ -2,12 +2,31 @@ import { useCallback, useEffect, useRef } from "react";
 import { useRecordingStore } from "../stores/recordingStore";
 import type { SelectedSource } from "../stores/recordingStore";
 import { StartRecording, StopRecording } from "../../wailsjs/go/app/App";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
+import { useToastStore } from "../stores/toastStore";
+
+interface RecordingDonePayload {
+  outputPath: string;
+}
 
 export function useRecording() {
   const store = useRecordingStore();
   const { state, format, elapsedSeconds, maxSeconds, selectedSource } = store;
-  const { setState, setElapsedSeconds, setSelectedSource, reset } = store;
+  const { setState, setElapsedSeconds, setSelectedSource, setOutputPath, reset } = store;
+  const showToast = useToastStore((s) => s.show);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!window.runtime) return;
+    const cancel = EventsOn("recording:done", (data: RecordingDonePayload) => {
+      setOutputPath(data.outputPath);
+      const filename = data.outputPath.split("/").pop() ?? data.outputPath;
+      showToast(`Recording saved: ${filename}`, "success");
+    });
+    return () => {
+      cancel();
+    };
+  }, [setOutputPath, showToast]);
 
   useEffect(() => {
     if (state === "recording") {

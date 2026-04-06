@@ -27,16 +27,20 @@ export function ListWindows():Promise<Array<app.WindowInfo>>;
 
 export function LoadConfig():Promise<port.AppConfig>;
 
+export function OpenFile(arg1:string):Promise<void>;
+
 export function OpenPermissionsSettings():Promise<void>;
 
 export function RequestScreenCapture():Promise<void>;
 
+export function RevealFile(arg1:string):Promise<void>;
+
 export function SaveConfig(arg1:port.AppConfig):Promise<void>;
+
+export function SaveDir():Promise<string>;
 
 export function SaveLastScreenshot(arg1:string):Promise<void>;
 
 export function StartRecording(arg1:string):Promise<void>;
-
-export function StartRecordingRegion(arg1:number,arg2:number,arg3:number,arg4:number,arg5:string):Promise<void>;
 
 export function StopRecording():Promise<void>;

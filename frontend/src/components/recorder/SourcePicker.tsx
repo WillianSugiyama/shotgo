@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Monitor, Play } from "lucide-react";
-import { ListRecordingSources } from "../../../wailsjs/go/app/App";
+import { ListRecordingSources, CaptureFullscreen } from "../../../wailsjs/go/app/App";
 import type { SelectedSource } from "../../stores/recordingStore";
 import { color, radius, space, font } from "../../styles/tokens";
 import { btnPrimary } from "../../styles/buttons";
@@ -20,6 +20,8 @@ export function SourcePicker({ onSelect }: Props) {
     { type: "screen", id: "0", name: "Fullscreen" },
   ]);
   const [selected, setSelected] = useState(0);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     ListRecordingSources()
@@ -36,12 +38,25 @@ export function SourcePicker({ onSelect }: Props) {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    setLoading(true);
+    setThumbnail(null);
+    CaptureFullscreen()
+      .then((res) => setThumbnail(res.imageBase64))
+      .catch(() => setThumbnail(null))
+      .finally(() => setLoading(false));
+  }, [selected]);
+
   const current = sources[selected];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: space.lg }}>
+    <div style={container}>
       <Monitor size={40} color={color.accent} />
       <p style={{ color: color.textMuted, fontSize: 13 }}>Select what to record</p>
+      {loading && <p style={{ color: color.textMuted, fontSize: 12 }}>Loading preview...</p>}
+      {!loading && thumbnail && (
+        <img src={`data:image/png;base64,${thumbnail}`} alt="Preview" style={thumbStyle} />
+      )}
       <select
         value={selected}
         onChange={(e) => setSelected(Number(e.target.value))}
@@ -60,6 +75,12 @@ export function SourcePicker({ onSelect }: Props) {
   );
 }
 
+const container: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: space.lg,
+};
 const selectStyle: React.CSSProperties = {
   width: 280,
   padding: `${space.sm}px ${space.md}px`,
@@ -71,4 +92,9 @@ const selectStyle: React.CSSProperties = {
   borderRadius: radius.md,
   outline: "none",
   cursor: "pointer",
+};
+const thumbStyle: React.CSSProperties = {
+  maxWidth: 280,
+  borderRadius: radius.md,
+  border: `1px solid ${color.border}`,
 };

@@ -46,6 +46,10 @@ export function LoadConfig() {
   return window['go']['app']['App']['LoadConfig']();
 }
 
+export function OpenFile(arg1) {
+  return window['go']['app']['App']['OpenFile'](arg1);
+}
+
 export function OpenPermissionsSettings() {
   return window['go']['app']['App']['OpenPermissionsSettings']();
 }
@@ -54,8 +58,16 @@ export function RequestScreenCapture() {
   return window['go']['app']['App']['RequestScreenCapture']();
 }
 
+export function RevealFile(arg1) {
+  return window['go']['app']['App']['RevealFile'](arg1);
+}
+
 export function SaveConfig(arg1) {
   return window['go']['app']['App']['SaveConfig'](arg1);
+}
+
+export function SaveDir() {
+  return window['go']['app']['App']['SaveDir']();
 }
 
 export function SaveLastScreenshot(arg1) {
@@ -64,10 +76,6 @@ export function SaveLastScreenshot(arg1) {
 
 export function StartRecording(arg1) {
   return window['go']['app']['App']['StartRecording'](arg1);
-}
-
-export function StartRecordingRegion(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['StartRecordingRegion'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function StopRecording() {
