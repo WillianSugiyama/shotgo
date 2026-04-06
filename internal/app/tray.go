@@ -1,12 +1,10 @@
 package app
 
 import (
-	"log"
-
+	"fyne.io/systray"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// globalApp holds a reference for the CGo callback.
 var globalApp *App
 
 func (a *App) emitAction(action string) {
@@ -16,35 +14,54 @@ func (a *App) emitAction(action string) {
 }
 
 func (a *App) showWindow() {
-	if a.ctx == nil {
-		return
+	if a.ctx != nil {
+		wailsRuntime.WindowShow(a.ctx)
 	}
-	wailsRuntime.WindowShow(a.ctx)
 }
 
-var trayActions = map[int]string{
-	1: "capture-fullscreen",
-	2: "capture-region",
-	3: "record-screen",
-	4: "settings",
-	5: "quit",
+func setupTray() {
+	systray.Register(onTrayReady, func() {})
 }
 
-func handleTrayAction(tag int) {
-	if globalApp == nil {
-		return
-	}
-	action, ok := trayActions[tag]
-	if !ok {
-		return
-	}
-	log.Printf("[shotgo] tray action: %s", action)
+func onTrayReady() {
+	systray.SetTitle("SG")
+	systray.SetTooltip("ShotGo")
 
-	switch action {
-	case "quit":
-		wailsRuntime.Quit(globalApp.ctx)
-	default:
-		globalApp.showWindow()
-		globalApp.emitAction(action)
-	}
+	mFull := systray.AddMenuItem("Capture Fullscreen", "Ctrl+Shift+1")
+	mRegion := systray.AddMenuItem("Capture Region", "Ctrl+Shift+2")
+	systray.AddSeparator()
+	mRecord := systray.AddMenuItem("Record Screen", "Ctrl+Shift+3")
+	systray.AddSeparator()
+	mSettings := systray.AddMenuItem("Settings", "")
+	mQuit := systray.AddMenuItem("Quit", "")
+
+	go func() {
+		for {
+			select {
+			case <-mFull.ClickedCh:
+				if globalApp != nil {
+					globalApp.emitAction("capture-fullscreen")
+				}
+			case <-mRegion.ClickedCh:
+				if globalApp != nil {
+					globalApp.emitAction("capture-region")
+				}
+			case <-mRecord.ClickedCh:
+				if globalApp != nil {
+					globalApp.showWindow()
+					globalApp.emitAction("record-screen")
+				}
+			case <-mSettings.ClickedCh:
+				if globalApp != nil {
+					globalApp.showWindow()
+					globalApp.emitAction("settings")
+				}
+			case <-mQuit.ClickedCh:
+				if globalApp != nil {
+					wailsRuntime.Quit(globalApp.ctx)
+				}
+				return
+			}
+		}
+	}()
 }

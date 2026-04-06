@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"fyne.io/systray"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"shotgo/internal/domain/entity"
@@ -14,7 +15,7 @@ func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 	globalApp = a
 
-	setupNativeTray()
+	setupTray()
 
 	cfg, err := a.loadConfig.Execute()
 	if err != nil {
@@ -40,7 +41,7 @@ func (a *App) Startup(ctx context.Context) {
 
 // Shutdown is called when the Wails app is closing.
 func (a *App) Shutdown(_ context.Context) {
-	removeNativeTray()
+	systray.Quit()
 	if a.hotkeyMgr != nil {
 		_ = a.hotkeyMgr.Unregister()
 	}

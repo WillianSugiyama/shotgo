@@ -3,6 +3,7 @@ module shotgo
 go 1.24
 
 require (
+	fyne.io/systray v1.12.0
 	github.com/wailsapp/wails/v2 v2.12.0
 	golang.design/x/hotkey v0.4.1
 )
