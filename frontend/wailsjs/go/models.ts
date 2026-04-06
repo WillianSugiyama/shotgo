@@ -54,24 +54,6 @@ export namespace app {
 	        this.app = source["app"];
 	    }
 	}
-	export class RecordingResult {
-	    id: string;
-	    format: string;
-	    duration: number;
-	    outputPath: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new RecordingResult(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.format = source["format"];
-	        this.duration = source["duration"];
-	        this.outputPath = source["outputPath"];
-	    }
-	}
 	export class ScreenInfo {
 	    index: number;
 	    name: string;

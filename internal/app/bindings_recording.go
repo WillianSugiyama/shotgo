@@ -1,13 +1,12 @@
 package app
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"time"
+	"log"
 
 	"shotgo/internal/adapter/recorder"
 	"shotgo/internal/domain/entity"
+
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // StartRecording begins a screen recording session.
@@ -19,41 +18,26 @@ func (a *App) StartRecording(format string) error {
 // StartRecordingRegion begins recording a specific region.
 func (a *App) StartRecordingRegion(x, y, w, h int, format string) error {
 	region := &entity.Region{X: x, Y: y, Width: w, Height: h}
-	outputFormat := entity.OutputFormat(format)
-	return a.startRecording.Execute(region, outputFormat)
+	return a.startRecording.Execute(region, entity.OutputFormat(format))
 }
 
-// StopRecording ends the recording and converts output via ffmpeg.
-func (a *App) StopRecording() (*RecordingResult, error) {
-	rec, err := a.stopRecording.Execute()
-	if err != nil {
-		return nil, err
-	}
-
-	finalPath, err := a.convertRecording(rec)
-	if err != nil {
-		return nil, err
-	}
-
-	return &RecordingResult{
-		ID:         rec.ID,
-		Format:     string(rec.Format),
-		Duration:   rec.Duration.Seconds(),
-		OutputPath: finalPath,
-	}, nil
-}
-
-func (a *App) convertRecording(rec *entity.Recording) (string, error) {
-	dir := filepath.Join(os.TempDir(), "shotgo-output")
-	_ = os.MkdirAll(dir, 0o755)
-
-	ts := time.Now().Format("20060102_150405")
-	outPath := filepath.Join(dir, fmt.Sprintf("ShotGo_%s.%s", ts, rec.Format))
-
-	if rec.Format == entity.FormatGIF {
-		return outPath, a.ffmpegClient.EncodeGIF(rec.OutputPath, outPath, 15, 640)
-	}
-	return outPath, a.ffmpegClient.ConvertToMP4(rec.OutputPath, outPath)
+// StopRecording signals stop and processes in background.
+// Emits "recording:done" event when the file is ready.
+func (a *App) StopRecording() error {
+	go func() {
+		rec, err := a.stopRecording.Execute()
+		if err != nil {
+			log.Printf("[shotgo] stop recording error: %v", err)
+			wailsRuntime.EventsEmit(a.ctx, "recording:error", err.Error())
+			return
+		}
+		log.Printf("[shotgo] recording stopped: %s", rec.OutputPath)
+		wailsRuntime.EventsEmit(a.ctx, "recording:done", RecordingResult{
+			ID: rec.ID, Format: string(rec.Format),
+			Duration: rec.Duration.Seconds(), OutputPath: rec.OutputPath,
+		})
+	}()
+	return nil
 }
 
 // RecordingResult is the frontend-facing recording response.
@@ -64,14 +48,13 @@ type RecordingResult struct {
 	OutputPath string  `json:"outputPath"`
 }
 
-// ListRecordingSources returns available screens and windows for recording.
+// ListRecordingSources returns available screens and windows.
 func (a *App) ListRecordingSources() *RecordingSources {
 	screens := recorder.ListScreens(a.ffmpegPath)
 	si := make([]ScreenInfo, len(screens))
 	for i, s := range screens {
 		si[i] = ScreenInfo{Index: s.Index, Name: s.Name}
 	}
-
 	windows := recorder.ListRecordableWindows()
 	wi := make([]RecWindowInfo, len(windows))
 	for i, w := range windows {
@@ -92,7 +75,7 @@ type ScreenInfo struct {
 	Name  string `json:"name"`
 }
 
-// RecWindowInfo is a frontend-facing window descriptor for recording.
+// RecWindowInfo is a frontend-facing window descriptor.
 type RecWindowInfo struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`

@@ -39,4 +39,4 @@ export function StartRecording(arg1:string):Promise<void>;
 
 export function StartRecordingRegion(arg1:number,arg2:number,arg3:number,arg4:number,arg5:string):Promise<void>;
 
-export function StopRecording():Promise<app.RecordingResult>;
+export function StopRecording():Promise<void>;
