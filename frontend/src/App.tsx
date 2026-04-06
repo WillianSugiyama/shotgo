@@ -5,6 +5,7 @@ import { RecorderControls } from "./components/recorder/RecorderControls";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
 import { Welcome } from "./components/onboarding/Welcome";
 import { useTrayEvents } from "./hooks/useTrayEvents";
+import { useCapture } from "./hooks/useCapture";
 
 function App() {
   const { view, isFirstLaunch } = useAppStore();
@@ -30,24 +31,43 @@ function App() {
 
 function IdleView() {
   const { setView } = useAppStore();
+  const { captureFullscreen, startRegionSelect } = useCapture();
 
   return (
-    <div style={{ padding: 24, textAlign: "center", color: "#fff" }}>
-      <h1>ShotGo</h1>
-      <p style={{ color: "#aaa" }}>Ready. Use hotkeys or the tray menu to capture.</p>
-      <button onClick={() => setView("settings")} style={linkStyle}>
-        Settings
-      </button>
+    <div style={{ padding: 48, textAlign: "center", color: "#fff" }}>
+      <h1 style={{ marginBottom: 8 }}>ShotGo</h1>
+      <p style={{ color: "#aaa", marginBottom: 32 }}>Screenshot & Recording Tool</p>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+        <button onClick={captureFullscreen} style={btnStyle}>
+          Fullscreen
+        </button>
+        <button onClick={startRegionSelect} style={btnStyle}>
+          Region
+        </button>
+        <button onClick={() => setView("recorder")} style={btnStyle}>
+          Record
+        </button>
+        <button onClick={() => setView("settings")} style={btnSecondary}>
+          Settings
+        </button>
+      </div>
     </div>
   );
 }
 
-const linkStyle: React.CSSProperties = {
-  background: "none",
+const btnStyle: React.CSSProperties = {
+  padding: "10px 20px",
+  background: "#4A90D9",
+  color: "#fff",
   border: "none",
-  color: "#4A90D9",
+  borderRadius: 6,
   cursor: "pointer",
-  textDecoration: "underline",
+  fontSize: 14,
+};
+
+const btnSecondary: React.CSSProperties = {
+  ...btnStyle,
+  background: "#2d2d44",
 };
 
 export default App;
