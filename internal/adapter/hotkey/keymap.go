@@ -2,19 +2,6 @@ package hotkey
 
 import "golang.design/x/hotkey"
 
-// modifierMap maps string modifier names to hotkey.Modifier constants.
-// Platform-specific aliases (Cmd/Option on macOS, Win on Windows) are
-// handled by the same constants — the hotkey package resolves them.
-var modifierMap = map[string]hotkey.Modifier{
-	"Ctrl":   hotkey.ModCtrl,
-	"Shift":  hotkey.ModShift,
-	"Alt":    hotkey.ModOption, // ModOption == ModAlt on Windows/Linux
-	"Option": hotkey.ModOption,
-	"Cmd":    hotkey.ModCmd, // ModCmd == ModWin on Windows/Linux
-	"Win":    hotkey.ModCmd,
-}
-
-// keyMap maps key name strings to hotkey.Key constants.
 var keyMap = map[string]hotkey.Key{
 	"A": hotkey.KeyA, "B": hotkey.KeyB, "C": hotkey.KeyC, "D": hotkey.KeyD,
 	"E": hotkey.KeyE, "F": hotkey.KeyF, "G": hotkey.KeyG, "H": hotkey.KeyH,
@@ -38,7 +25,6 @@ var keyMap = map[string]hotkey.Key{
 	"Left": hotkey.KeyLeft, "Right": hotkey.KeyRight,
 }
 
-// parseModifiers converts string modifier names to hotkey.Modifier values.
 func parseModifiers(names []string) []hotkey.Modifier {
 	mods := make([]hotkey.Modifier, 0, len(names))
 	for _, n := range names {
@@ -49,8 +35,6 @@ func parseModifiers(names []string) []hotkey.Modifier {
 	return mods
 }
 
-// parseKey converts a string key name to a hotkey.Key value.
-// Returns the key and true if found, zero and false otherwise.
 func parseKey(name string) (hotkey.Key, bool) {
 	k, ok := keyMap[name]
 	return k, ok
