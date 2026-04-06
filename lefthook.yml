@@ -2,16 +2,19 @@ pre-commit:
   parallel: true
   jobs:
     - name: oxfmt
-      glob: "frontend/src/**/*.{ts,tsx}"
-      run: cd frontend && npx oxfmt --check {staged_files}
+      root: "frontend/"
+      glob: "src/**/*.{ts,tsx}"
+      run: npx oxfmt --check {staged_files}
 
     - name: oxlint
-      glob: "frontend/src/**/*.{ts,tsx}"
-      run: cd frontend && npx oxlint {staged_files}
+      root: "frontend/"
+      glob: "src/**/*.{ts,tsx}"
+      run: npx oxlint {staged_files}
 
     - name: typecheck
-      glob: "frontend/src/**/*.{ts,tsx}"
-      run: cd frontend && npx tsgo --noEmit
+      root: "frontend/"
+      glob: "src/**/*.{ts,tsx}"
+      run: npx tsgo --noEmit
 
     - name: go-lint
       glob: "**/*.go"

@@ -10,7 +10,7 @@ export function SelectionOverlay() {
     (region: Region) => {
       captureRegion(region);
     },
-    [captureRegion]
+    [captureRegion],
   );
 
   const handleCancel = useCallback(() => {

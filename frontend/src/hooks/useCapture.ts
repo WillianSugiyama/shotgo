@@ -25,9 +25,7 @@ export function useCapture() {
     async (region: Region) => {
       setCapturing(true);
       try {
-        const result = await CaptureRegion(
-          region.x, region.y, region.width, region.height
-        );
+        const result = await CaptureRegion(region.x, region.y, region.width, region.height);
         setImageData(result.id);
         setView("editor");
       } catch (err) {
@@ -36,7 +34,7 @@ export function useCapture() {
         setCapturing(false);
       }
     },
-    [setCapturing, setImageData, setView]
+    [setCapturing, setImageData, setView],
   );
 
   const startRegionSelect = useCallback(() => {

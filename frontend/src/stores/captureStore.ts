@@ -30,6 +30,5 @@ export const useCaptureStore = create<CaptureState>((set) => ({
   setRegion: (region) => set({ region }),
   setImageData: (imageData) => set({ imageData }),
   setCapturing: (isCapturing) => set({ isCapturing }),
-  reset: () =>
-    set({ mode: null, region: null, imageData: null, isCapturing: false }),
+  reset: () => set({ mode: null, region: null, imageData: null, isCapturing: false }),
 }));

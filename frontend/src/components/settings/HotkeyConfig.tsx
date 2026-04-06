@@ -14,9 +14,7 @@ export function HotkeyConfig() {
   return (
     <div style={{ marginTop: 16 }}>
       <h3>Hotkeys</h3>
-      {hotkeys.length === 0 && (
-        <p style={{ color: "#888" }}>No hotkeys configured yet.</p>
-      )}
+      {hotkeys.length === 0 && <p style={{ color: "#888" }}>No hotkeys configured yet.</p>}
       {hotkeys.map((binding) => (
         <div
           key={binding.action}
@@ -28,9 +26,7 @@ export function HotkeyConfig() {
           }}
         >
           <span>{actionLabels[binding.action] ?? binding.action}</span>
-          <kbd style={kbdStyle}>
-            {[...binding.modifiers, binding.key].join(" + ")}
-          </kbd>
+          <kbd style={kbdStyle}>{[...binding.modifiers, binding.key].join(" + ")}</kbd>
         </div>
       ))}
     </div>

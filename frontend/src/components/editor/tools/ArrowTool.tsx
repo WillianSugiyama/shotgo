@@ -27,11 +27,11 @@ export function drawArrow(ctx: CanvasRenderingContext2D, arrow: ArrowData) {
   ctx.moveTo(endX, endY);
   ctx.lineTo(
     endX - headLength * Math.cos(angle - Math.PI / 6),
-    endY - headLength * Math.sin(angle - Math.PI / 6)
+    endY - headLength * Math.sin(angle - Math.PI / 6),
   );
   ctx.lineTo(
     endX - headLength * Math.cos(angle + Math.PI / 6),
-    endY - headLength * Math.sin(angle + Math.PI / 6)
+    endY - headLength * Math.sin(angle + Math.PI / 6),
   );
   ctx.closePath();
   ctx.fill();

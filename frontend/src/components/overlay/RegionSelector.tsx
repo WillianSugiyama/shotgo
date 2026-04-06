@@ -20,7 +20,7 @@ export function RegionSelector({ onSelect, onCancel }: Props) {
     (e: MouseEvent) => {
       if (start) setCurrent({ x: e.clientX, y: e.clientY });
     },
-    [start]
+    [start],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -43,7 +43,7 @@ export function RegionSelector({ onSelect, onCancel }: Props) {
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") onCancel();
     },
-    [onCancel]
+    [onCancel],
   );
 
   const rect =

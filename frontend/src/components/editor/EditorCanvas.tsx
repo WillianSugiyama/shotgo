@@ -30,10 +30,7 @@ export function EditorCanvas() {
         onCancel={handleCancel}
       />
       <div style={{ flex: 1, overflow: "auto", background: "#0d0d1a" }}>
-        <canvas
-          ref={canvasRef}
-          style={{ display: "block", margin: "auto" }}
-        />
+        <canvas ref={canvasRef} style={{ display: "block", margin: "auto" }} />
       </div>
     </div>
   );

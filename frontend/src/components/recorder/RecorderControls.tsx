@@ -1,14 +1,15 @@
 import { useRecording } from "../../hooks/useRecording";
 
 function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
   const s = (seconds % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
 
 export function RecorderControls() {
-  const { state, elapsedSeconds, maxSeconds, start, stop, pause, resume } =
-    useRecording();
+  const { state, elapsedSeconds, maxSeconds, start, stop, pause, resume } = useRecording();
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 12 }}>
@@ -23,7 +24,9 @@ export function RecorderControls() {
       )}
       {state === "recording" && (
         <>
-          <button onClick={pause} style={btnStyle}>Pause</button>
+          <button onClick={pause} style={btnStyle}>
+            Pause
+          </button>
           <button onClick={stop} style={{ ...btnStyle, background: "#c0392b" }}>
             Stop
           </button>
@@ -31,16 +34,16 @@ export function RecorderControls() {
       )}
       {state === "paused" && (
         <>
-          <button onClick={resume} style={btnStyle}>Resume</button>
+          <button onClick={resume} style={btnStyle}>
+            Resume
+          </button>
           <button onClick={stop} style={{ ...btnStyle, background: "#c0392b" }}>
             Stop
           </button>
         </>
       )}
 
-      {state === "recording" && (
-        <span style={{ color: "#e74c3c", fontWeight: "bold" }}>REC</span>
-      )}
+      {state === "recording" && <span style={{ color: "#e74c3c", fontWeight: "bold" }}>REC</span>}
     </div>
   );
 }

@@ -35,8 +35,12 @@ export function Toolbar({ activeTool, onSelectTool, onSave, onCopy, onCancel }: 
         </button>
       ))}
       <div style={{ flex: 1 }} />
-      <button onClick={onCopy} style={actionStyle}>Copy</button>
-      <button onClick={onSave} style={actionStyle}>Save</button>
+      <button onClick={onCopy} style={actionStyle}>
+        Copy
+      </button>
+      <button onClick={onSave} style={actionStyle}>
+        Save
+      </button>
       <button onClick={onCancel} style={{ ...actionStyle, background: "#6b2d2d" }}>
         Cancel
       </button>

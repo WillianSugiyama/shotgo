@@ -1,10 +1,6 @@
 import { useCallback } from "react";
 import { useSettingsStore, HotkeyBinding } from "../stores/settingsStore";
-import {
-  LoadConfig,
-  SaveConfig,
-  ConfigureHotkeys,
-} from "../../wailsjs/go/app/App";
+import { LoadConfig, SaveConfig, ConfigureHotkeys } from "../../wailsjs/go/app/App";
 import { port } from "../../wailsjs/go/models";
 
 export function useSettings() {
@@ -42,13 +38,13 @@ export function useSettings() {
       store.setHotkeys(hotkeys);
       try {
         await ConfigureHotkeys(
-          hotkeys.map((h) => ({ action: h.action, modifiers: h.modifiers, key: h.key }))
+          hotkeys.map((h) => ({ action: h.action, modifiers: h.modifiers, key: h.key })),
         );
       } catch (err) {
         console.error("Configure hotkeys failed:", err);
       }
     },
-    [store]
+    [store],
   );
 
   return { ...store, loadSettings, saveSettings, updateHotkeys };

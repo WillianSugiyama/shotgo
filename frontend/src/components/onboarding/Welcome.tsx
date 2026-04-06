@@ -12,8 +12,8 @@ export function Welcome() {
     <div style={{ textAlign: "center", padding: 48, color: "#fff" }}>
       <h1>Welcome to ShotGo</h1>
       <p style={{ color: "#aaa", maxWidth: 400, margin: "16px auto" }}>
-        A fast, lightweight screenshot and recording tool.
-        Let's set up a few things before you start.
+        A fast, lightweight screenshot and recording tool. Let's set up a few things before you
+        start.
       </p>
       <button onClick={handleContinue} style={btnStyle}>
         Get Started

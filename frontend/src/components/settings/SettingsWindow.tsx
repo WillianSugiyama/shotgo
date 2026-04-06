@@ -56,7 +56,9 @@ export function SettingsWindow() {
 
       <HotkeyConfig />
 
-      <button onClick={saveSettings} style={btnStyle}>Save</button>
+      <button onClick={saveSettings} style={btnStyle}>
+        Save
+      </button>
     </div>
   );
 }

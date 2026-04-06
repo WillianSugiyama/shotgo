@@ -1,12 +1,6 @@
 import { create } from "zustand";
 
-export type AppView =
-  | "idle"
-  | "overlay"
-  | "editor"
-  | "recorder"
-  | "settings"
-  | "onboarding";
+export type AppView = "idle" | "overlay" | "editor" | "recorder" | "settings" | "onboarding";
 
 interface AppState {
   view: AppView;
