@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { Monitor, AppWindow } from "lucide-react";
+import { Monitor, Play } from "lucide-react";
 import { ListRecordingSources } from "../../../wailsjs/go/app/App";
 import type { SelectedSource } from "../../stores/recordingStore";
-import { card, heading, wrap, ellipsis } from "./sourcePickerStyles";
+import { color, radius, space, font } from "../../styles/tokens";
+import { btnPrimary } from "../../styles/buttons";
 
-interface Screen {
-  index: number;
-  name: string;
-}
-interface Window {
+interface Source {
+  type: "screen" | "window";
   id: string;
-  title: string;
-  app: string;
+  name: string;
 }
 
 interface Props {
@@ -19,52 +16,59 @@ interface Props {
 }
 
 export function SourcePicker({ onSelect }: Props) {
-  const [screens, setScreens] = useState<Screen[]>([]);
-  const [windows, setWindows] = useState<Window[]>([]);
+  const [sources, setSources] = useState<Source[]>([
+    { type: "screen", id: "0", name: "Fullscreen" },
+  ]);
+  const [selected, setSelected] = useState(0);
 
   useEffect(() => {
-    ListRecordingSources().then((src) => {
-      setScreens(src?.screens ?? []);
-      setWindows(src?.windows ?? []);
-    });
+    ListRecordingSources()
+      .then((src) => {
+        const list: Source[] = [{ type: "screen", id: "0", name: "Fullscreen" }];
+        for (const s of src?.screens ?? []) {
+          list.push({ type: "screen", id: String(s.index), name: s.name });
+        }
+        for (const w of src?.windows ?? []) {
+          list.push({ type: "window", id: w.id, name: `${w.app}` });
+        }
+        setSources(list);
+      })
+      .catch(() => {});
   }, []);
 
-  return (
-    <div style={wrap}>
-      <span style={heading}>Screens</span>
-      <button
-        style={card}
-        onClick={() => onSelect({ type: "screen", id: "0", name: "Fullscreen" })}
-      >
-        <Monitor size={16} /> Fullscreen
-      </button>
-      {screens.map((s) => (
-        <button
-          key={s.index}
-          style={card}
-          onClick={() => onSelect({ type: "screen", id: String(s.index), name: s.name })}
-        >
-          <Monitor size={16} /> {s.name}
-        </button>
-      ))}
+  const current = sources[selected];
 
-      {windows.length > 0 && (
-        <>
-          <span style={heading}>Windows</span>
-          {windows.map((w) => (
-            <button
-              key={w.id}
-              style={card}
-              onClick={() => onSelect({ type: "window", id: w.id, name: `${w.app} — ${w.title}` })}
-            >
-              <AppWindow size={16} />
-              <span style={ellipsis}>
-                {w.app} — {w.title}
-              </span>
-            </button>
-          ))}
-        </>
-      )}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: space.lg }}>
+      <Monitor size={40} color={color.accent} />
+      <p style={{ color: color.textMuted, fontSize: 13 }}>Select what to record</p>
+      <select
+        value={selected}
+        onChange={(e) => setSelected(Number(e.target.value))}
+        style={selectStyle}
+      >
+        {sources.map((s, i) => (
+          <option key={s.id + s.type} value={i}>
+            {s.type === "screen" ? `Screen: ${s.name}` : `Window: ${s.name}`}
+          </option>
+        ))}
+      </select>
+      <button onClick={() => onSelect(current)} style={{ ...btnPrimary, padding: "12px 32px" }}>
+        <Play size={16} fill="white" /> Start Recording
+      </button>
     </div>
   );
 }
+
+const selectStyle: React.CSSProperties = {
+  width: 280,
+  padding: `${space.sm}px ${space.md}px`,
+  fontSize: 14,
+  fontFamily: font.body,
+  background: color.surface,
+  color: color.text,
+  border: `1px solid ${color.border}`,
+  borderRadius: radius.md,
+  outline: "none",
+  cursor: "pointer",
+};

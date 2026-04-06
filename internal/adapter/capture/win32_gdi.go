@@ -10,9 +10,11 @@ import (
 var (
 	user32              = syscall.NewLazyDLL("user32.dll")
 	gdi32               = syscall.NewLazyDLL("gdi32.dll")
+	shcore              = syscall.NewLazyDLL("shcore.dll")
 	pGetDC              = user32.NewProc("GetDC")
 	pReleaseDC          = user32.NewProc("ReleaseDC")
 	pGetSystemMetrics   = user32.NewProc("GetSystemMetrics")
+	pSetDPIAwareness    = shcore.NewProc("SetProcessDpiAwareness")
 	pCreateCompatibleDC = gdi32.NewProc("CreateCompatibleDC")
 	pCreateCompatBmp    = gdi32.NewProc("CreateCompatibleBitmap")
 	pSelectObject       = gdi32.NewProc("SelectObject")
@@ -41,6 +43,12 @@ type bitmapInfoHeader struct {
 	YPelsPerMeter int32
 	ClrUsed       uint32
 	ClrImportant  uint32
+}
+
+func init() {
+	// Enable per-monitor DPI awareness to get real pixel coordinates.
+	// Without this, GetSystemMetrics returns scaled (wrong) values.
+	pSetDPIAwareness.Call(2) // PROCESS_PER_MONITOR_DPI_AWARE
 }
 
 func getScreenSize() (int, int) {

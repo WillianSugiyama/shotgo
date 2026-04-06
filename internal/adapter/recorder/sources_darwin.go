@@ -40,14 +40,12 @@ func ListScreens(ffmpegPath string) []ScreenSource {
 	return screens
 }
 
-// parseDeviceIndex extracts the numeric index from "[AVFoundation ...] [N]".
 func parseDeviceIndex(line string) int {
 	parts := strings.Split(line, "[")
 	for _, p := range parts {
 		if idx := strings.Index(p, "]"); idx > 0 {
-			trimmed := strings.TrimSpace(p[:idx])
 			n := 0
-			for _, c := range trimmed {
+			for _, c := range strings.TrimSpace(p[:idx]) {
 				if c >= '0' && c <= '9' {
 					n = n*10 + int(c-'0')
 				} else {
@@ -68,32 +66,21 @@ func parseDeviceName(line string) string {
 	return strings.TrimSpace(parts[len(parts)-1])
 }
 
-// ListRecordableWindows uses osascript to list visible application windows.
+// ListRecordableWindows lists visible foreground apps using osascript.
 func ListRecordableWindows() []WindowSource {
-	script := `tell application "System Events" to get {name, title} of ` +
-		`every process whose visible is true and background only is false`
+	script := `tell application "System Events" to get name of every ` +
+		`process whose visible is true and background only is false`
 	out, err := exec.Command("osascript", "-e", script).Output()
 	if err != nil {
 		return nil
 	}
-	return parseOsascriptWindows(string(out))
-}
-
-// parseOsascriptWindows parses "name1, name2, title1, title2" output.
-func parseOsascriptWindows(raw string) []WindowSource {
-	parts := strings.Split(strings.TrimSpace(raw), ", ")
-	if len(parts) < 2 || len(parts)%2 != 0 {
-		return nil
-	}
-	half := len(parts) / 2
 	var windows []WindowSource
-	for i := 0; i < half; i++ {
-		app := strings.TrimSpace(parts[i])
-		title := strings.TrimSpace(parts[half+i])
-		if app == "" {
+	for _, name := range strings.Split(strings.TrimSpace(string(out)), ", ") {
+		name = strings.TrimSpace(name)
+		if name == "" || name == "Finder" || name == "Dock" {
 			continue
 		}
-		windows = append(windows, WindowSource{ID: app, Title: title, App: app})
+		windows = append(windows, WindowSource{ID: name, Title: name, App: name})
 	}
 	return windows
 }

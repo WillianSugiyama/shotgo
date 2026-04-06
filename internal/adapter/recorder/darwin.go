@@ -66,13 +66,7 @@ func (r *DarwinRecorder) Stop() (*entity.Recording, error) {
 	if !r.recording {
 		return nil, fmt.Errorf("not recording")
 	}
-	if r.stdin != nil {
-		_, _ = r.stdin.Write([]byte("q"))
-		_ = r.stdin.Close()
-	}
-	if r.cmd != nil {
-		_ = r.cmd.Wait()
-	}
+	gracefulStop(r.cmd, r.stdin)
 	duration := time.Since(r.startTime)
 	r.recording = false
 	return &entity.Recording{
