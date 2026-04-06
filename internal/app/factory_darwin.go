@@ -8,6 +8,7 @@ import (
 	"shotgo/internal/adapter/hotkey"
 	"shotgo/internal/adapter/permissions"
 	"shotgo/internal/adapter/recorder"
+	"shotgo/internal/infrastructure/ffmpeg"
 	"shotgo/internal/infrastructure/storage"
 	"shotgo/internal/usecase"
 )
@@ -21,9 +22,12 @@ func New() *App {
 	perms := permissions.NewDarwinPermissions()
 	fileStore := storage.NewLocalFileStorage("")
 	configStore, _ := storage.NewJSONConfigStore("")
+	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
+	ffmpegClient := ffmpeg.NewClient(ffmpegPath)
 
 	return &App{
 		hotkeyMgr:         hotkeyMgr,
+		ffmpegClient:      ffmpegClient,
 		captureFullscreen: usecase.NewCaptureFullscreen(capturer),
 		captureRegion:     usecase.NewCaptureRegion(capturer),
 		captureWindow:     usecase.NewCaptureWindow(capturer),

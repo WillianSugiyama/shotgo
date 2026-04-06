@@ -48,6 +48,20 @@ func (c *Client) EncodeGIF(inputPath string, outputPath string, fps int, width i
 	return nil
 }
 
+// ConvertToMP4 converts any video file to MP4 (h264).
+func (c *Client) ConvertToMP4(inputPath string, outputPath string) error {
+	cmd := exec.Command(c.binaryPath,
+		"-y", "-i", inputPath,
+		"-c:v", "libx264", "-pix_fmt", "yuv420p",
+		"-preset", "fast",
+		outputPath,
+	)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("ffmpeg ConvertToMP4 failed: %w\noutput: %s", err, string(out))
+	}
+	return nil
+}
+
 // ExtractFrames extracts individual frames from a video file into outputDir.
 func (c *Client) ExtractFrames(videoPath string, outputDir string) error {
 	pattern := fmt.Sprintf("%s/frame_%%05d.png", outputDir)

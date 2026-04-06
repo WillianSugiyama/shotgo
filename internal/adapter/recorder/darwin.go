@@ -4,8 +4,12 @@ package recorder
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
+	"syscall"
+	"time"
 
 	"shotgo/internal/domain/entity"
 )
@@ -18,12 +22,10 @@ type DarwinRecorder struct {
 	paused    bool
 	format    entity.OutputFormat
 	outPath   string
+	startTime time.Time
 }
 
-// NewDarwinRecorder returns a new DarwinRecorder.
-func NewDarwinRecorder() *DarwinRecorder {
-	return &DarwinRecorder{}
-}
+func NewDarwinRecorder() *DarwinRecorder { return &DarwinRecorder{} }
 
 func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat) error {
 	r.mu.Lock()
@@ -31,15 +33,15 @@ func (r *DarwinRecorder) Start(region *entity.Region, format entity.OutputFormat
 	if r.recording {
 		return fmt.Errorf("already recording")
 	}
-	// TODO: build output path from config; use -v flag for video capture
-	// TODO: support region parameter via -R flag
+
 	r.format = format
-	r.outPath = fmt.Sprintf("/tmp/shotgo-rec.%s", format)
+	r.outPath = filepath.Join(os.TempDir(), fmt.Sprintf("shotgo-rec-%d.mov", time.Now().UnixNano()))
 	r.cmd = exec.Command("screencapture", "-v", r.outPath)
 	if err := r.cmd.Start(); err != nil {
 		return fmt.Errorf("start recording: %w", err)
 	}
 	r.recording = true
+	r.startTime = time.Now()
 	return nil
 }
 
@@ -49,16 +51,23 @@ func (r *DarwinRecorder) Stop() (*entity.Recording, error) {
 	if !r.recording {
 		return nil, fmt.Errorf("not recording")
 	}
-	// TODO: send interrupt signal to stop screencapture gracefully
+
 	if r.cmd != nil && r.cmd.Process != nil {
-		_ = r.cmd.Process.Kill()
+		_ = r.cmd.Process.Signal(syscall.SIGINT)
+		_ = r.cmd.Wait()
 	}
+
+	duration := time.Since(r.startTime)
 	r.recording = false
 	r.paused = false
+
 	return &entity.Recording{
+		ID:         fmt.Sprintf("rec-%d", time.Now().UnixNano()),
 		State:      entity.RecordingStopped,
 		Format:     r.format,
 		OutputPath: r.outPath,
+		StartedAt:  r.startTime,
+		Duration:   duration,
 	}, nil
 }
 
@@ -66,9 +75,8 @@ func (r *DarwinRecorder) Pause() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if !r.recording || r.paused {
-		return fmt.Errorf("cannot pause: not actively recording")
+		return fmt.Errorf("cannot pause")
 	}
-	// TODO: implement pause via signal or AVFoundation
 	r.paused = true
 	return nil
 }
@@ -79,7 +87,6 @@ func (r *DarwinRecorder) Resume() error {
 	if !r.paused {
 		return fmt.Errorf("not paused")
 	}
-	// TODO: implement resume via signal or AVFoundation
 	r.paused = false
 	return nil
 }

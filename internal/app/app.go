@@ -5,6 +5,7 @@ import (
 
 	"shotgo/internal/domain/entity"
 	"shotgo/internal/domain/port"
+	"shotgo/internal/infrastructure/ffmpeg"
 	"shotgo/internal/usecase"
 )
 
@@ -18,6 +19,9 @@ type App struct {
 
 	// Hotkey manager for registering/unregistering global hotkeys
 	hotkeyMgr port.HotkeyManager
+
+	// FFmpeg client for video conversion
+	ffmpegClient *ffmpeg.Client
 
 	// Use cases
 	captureFullscreen *usecase.CaptureFullscreen
