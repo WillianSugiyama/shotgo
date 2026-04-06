@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build ShotGo for macOS
+# Build ShotGo for macOS (universal binary: arm64 + amd64)
 # Usage: ./scripts/build-darwin.sh [--sign] [--notarize]
 
 SIGN=false
 NOTARIZE=false
+VERSION=${VERSION:-"dev"}
 
 for arg in "$@"; do
   case $arg in
@@ -14,29 +15,25 @@ for arg in "$@"; do
   esac
 done
 
-echo "==> Building ShotGo for macOS..."
-wails build -platform darwin/universal
+echo "==> Building ShotGo $VERSION for macOS (universal)..."
+wails build -platform darwin/universal -ldflags "-X main.version=$VERSION"
 
 if [ "$SIGN" = true ]; then
-  echo "==> Signing application..."
-  # TODO: Replace with actual Developer ID
+  echo "==> Signing..."
   codesign --deep --force --verify --verbose \
-    --sign "Developer ID Application: YOUR_NAME (TEAM_ID)" \
-    --options runtime \
-    build/bin/ShotGo.app
+    --sign "${APPLE_SIGN_ID:-Developer ID Application}" \
+    --options runtime build/bin/ShotGo.app
 fi
+
+echo "==> Creating DMG..."
+hdiutil create -volname "ShotGo" -srcfolder build/bin/ShotGo.app \
+  -ov -format UDZO "build/bin/ShotGo-macOS-universal.dmg"
 
 if [ "$NOTARIZE" = true ]; then
-  echo "==> Creating DMG..."
-  hdiutil create -volname "ShotGo" -srcfolder build/bin/ShotGo.app \
-    -ov -format UDZO build/bin/ShotGo.dmg
-
-  echo "==> Submitting for notarization..."
-  xcrun notarytool submit build/bin/ShotGo.dmg \
+  echo "==> Notarizing..."
+  xcrun notarytool submit "build/bin/ShotGo-macOS-universal.dmg" \
     --keychain-profile "shotgo-notarize" --wait
-
-  echo "==> Stapling ticket..."
-  xcrun stapler staple build/bin/ShotGo.dmg
+  xcrun stapler staple "build/bin/ShotGo-macOS-universal.dmg"
 fi
 
-echo "==> Done! Output in build/bin/"
+echo "==> Done: build/bin/ShotGo-macOS-universal.dmg"

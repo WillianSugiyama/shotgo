@@ -93,20 +93,41 @@ wails dev
 
 Opens the app with hot reload. Frontend changes reflect instantly; Go changes trigger a rebuild.
 
+## Download
+
+Grab the latest release from [GitHub Releases](../../releases/latest):
+
+| Platform | File |
+|---|---|
+| macOS (Apple Silicon + Intel) | `ShotGo-macOS-universal.dmg` |
+| Windows x64 | `ShotGo-Windows-x64-Setup.exe` |
+| Windows ARM64 | `ShotGo-Windows-arm64.exe` |
+
 ## Build
 
 ```bash
-wails build
+# macOS (universal binary: arm64 + amd64)
+wails build -platform darwin/universal
+
+# Windows x64
+wails build -platform windows/amd64
+
+# Windows ARM64
+wails build -platform windows/arm64
 ```
 
-Output: `build/bin/ShotGo.app` (macOS) or `build/bin/shotgo.exe` (Windows).
-
-To sign and run on macOS:
+Build scripts with signing support:
 
 ```bash
-codesign --force --deep --sign - build/bin/ShotGo.app
-xattr -cr build/bin/ShotGo.app
-open build/bin/ShotGo.app
+# macOS with DMG
+./scripts/build-darwin.sh
+
+# macOS with signing + notarization
+./scripts/build-darwin.sh --sign --notarize
+
+# Windows (amd64 or arm64)
+.\scripts\build-windows.ps1 -Arch amd64
+.\scripts\build-windows.ps1 -Arch arm64
 ```
 
 ## Pre-commit Hooks
@@ -132,11 +153,27 @@ Screenshots save to `~/Pictures/ShotGo/` by default.
 
 ## Platforms
 
-| Platform | Status |
-|---|---|
-| macOS (arm64/amd64) | Working — capture, record, tray, hotkeys |
-| Windows | Scaffolded — adapters are stubs |
-| Linux | Not in MVP |
+| Platform | Arch | Installer | Status |
+|---|---|---|---|
+| macOS | Universal (arm64 + x86_64) | DMG | Working — capture, record, tray, hotkeys |
+| Windows | x64 (amd64) | NSIS Setup | Scaffolded — adapters are stubs |
+| Windows | ARM64 | Portable exe | Scaffolded — adapters are stubs |
+| Linux | — | — | Not in MVP |
+
+## Creating a Release
+
+Tag and push to trigger the CI/CD pipeline:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+GitHub Actions will automatically:
+1. Build macOS universal binary and create DMG
+2. Build Windows x64 with NSIS installer
+3. Build Windows ARM64 portable exe
+4. Create a GitHub Release with all artifacts and auto-generated release notes
 
 ## Contributing
 

@@ -11,48 +11,53 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"
-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
       - name: Install frontend deps
         run: cd frontend && npm ci
-
-      - name: Build
+      - name: Build universal
         run: wails build -platform darwin/universal
-
       - name: Test
         run: go test ./...
 
-  build-windows:
+  build-windows-amd64:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"
-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
       - name: Install frontend deps
         run: cd frontend && npm ci
-
-      - name: Build
+      - name: Build amd64
         run: wails build -platform windows/amd64
-
       - name: Test
         run: go test ./...
+
+  build-windows-arm64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - name: Install frontend deps
+        run: cd frontend && npm ci
+      - name: Build arm64
+        run: wails build -platform windows/arm64
