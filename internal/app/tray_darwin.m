@@ -4,7 +4,7 @@
 
 @interface SGTrayDelegate : NSObject
 - (void)menuAction:(NSMenuItem *)sender;
-- (void)setupTray;
+- (void)setupWithIcon:(const void *)bytes length:(int)len;
 - (void)removeTray;
 @end
 
@@ -16,20 +16,16 @@
     goTrayCallback((int)sender.tag);
 }
 
-- (void)setupTray {
+- (void)setupWithIcon:(const void *)bytes length:(int)len {
     _item = [[[NSStatusBar systemStatusBar]
         statusItemWithLength:NSSquareStatusItemLength] retain];
 
-    if (@available(macOS 11.0, *)) {
-        NSImage *img = [NSImage
-            imageWithSystemSymbolName:@"camera.viewfinder"
-            accessibilityDescription:@"ShotGo"];
-        if (img) {
-            [img setTemplate:YES];
-            _item.button.image = img;
-        } else {
-            _item.button.title = @"SG";
-        }
+    if (bytes && len > 0) {
+        NSData *data = [NSData dataWithBytes:bytes length:len];
+        NSImage *img = [[NSImage alloc] initWithData:data];
+        [img setSize:NSMakeSize(18, 18)];
+        [img setTemplate:YES];
+        _item.button.image = img;
     } else {
         _item.button.title = @"SG";
     }
@@ -65,10 +61,10 @@
 
 static SGTrayDelegate *_sgDel = nil;
 
-void SGSetupTray(void) {
+void SGSetupTrayWithIcon(const void *bytes, int len) {
     dispatch_async(dispatch_get_main_queue(), ^{
         _sgDel = [[SGTrayDelegate alloc] init];
-        [_sgDel setupTray];
+        [_sgDel setupWithIcon:bytes length:len];
     });
 }
 
