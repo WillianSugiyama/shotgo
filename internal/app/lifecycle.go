@@ -15,8 +15,13 @@ func (a *App) Startup(ctx context.Context) {
 
 	cfg, err := a.loadConfig.Execute()
 	if err != nil {
-		log.Printf("config: failed to load: %v", err)
+		log.Printf("[shotgo] config load error: %v", err)
 		return
+	}
+
+	log.Printf("[shotgo] loaded %d hotkey bindings", len(cfg.Hotkeys.Bindings))
+	for _, b := range cfg.Hotkeys.Bindings {
+		log.Printf("[shotgo]   %s -> %v + %s", b.Action, b.Combo.Modifiers, b.Combo.Key)
 	}
 
 	if len(cfg.Hotkeys.Bindings) == 0 {
@@ -24,10 +29,13 @@ func (a *App) Startup(ctx context.Context) {
 	}
 
 	err = a.hotkeyMgr.Register(cfg.Hotkeys, func(action entity.HotkeyAction) {
+		log.Printf("[shotgo] hotkey fired: %s", action)
 		runtime.EventsEmit(a.ctx, "hotkey:action", string(action))
 	})
 	if err != nil {
-		log.Printf("hotkey: failed to register: %v", err)
+		log.Printf("[shotgo] hotkey register FAILED: %v", err)
+	} else {
+		log.Printf("[shotgo] hotkeys registered successfully")
 	}
 }
 

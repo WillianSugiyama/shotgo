@@ -6,6 +6,7 @@ import { Welcome } from "./components/onboarding/Welcome";
 import { ToastContainer } from "./components/Toast";
 import { HoverBtn } from "./components/HoverBtn";
 import { useTrayEvents } from "./hooks/useTrayEvents";
+import { useHotkeyEvents } from "./hooks/useHotkeyEvents";
 import { useCapture } from "./hooks/useCapture";
 import { Camera, Monitor, Crop, Video, Settings } from "lucide-react";
 import { color, space } from "./styles/tokens";
@@ -15,6 +16,7 @@ import { centerScreen, iconBox, rowCenter, heading, subtext } from "./styles/lay
 function App() {
   const { view, isFirstLaunch } = useAppStore();
   useTrayEvents();
+  useHotkeyEvents();
   if (isFirstLaunch) return <Welcome />;
   const content = (() => {
     switch (view) {
