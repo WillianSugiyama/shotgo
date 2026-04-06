@@ -19,6 +19,9 @@ frontend/dist/
 *.swp
 *.swo
 
+# Node (root — lefthook only)
+node_modules/
+
 # OS
 .DS_Store
 Thumbs.db
