@@ -15,18 +15,19 @@ import (
 )
 
 type WindowsRecorder struct {
-	mu                sync.Mutex
-	ffmpegPath        string
-	cmd               *exec.Cmd
-	stdin             io.WriteCloser
-	recording, paused bool
-	format            entity.OutputFormat
-	outPath           string
-	startTime         time.Time
+	mu         sync.Mutex
+	ffmpegPath string
+	saveDir    string
+	cmd        *exec.Cmd
+	stdin      io.WriteCloser
+	recording  bool
+	format     entity.OutputFormat
+	outPath    string
+	startTime  time.Time
 }
 
-func NewWindowsRecorder(ffmpegPath string) *WindowsRecorder {
-	return &WindowsRecorder{ffmpegPath: ffmpegPath}
+func NewWindowsRecorder(ffmpegPath, saveDir string) *WindowsRecorder {
+	return &WindowsRecorder{ffmpegPath: ffmpegPath, saveDir: saveDir}
 }
 
 func (r *WindowsRecorder) Start(_ *entity.Region, format entity.OutputFormat) error {
@@ -37,8 +38,9 @@ func (r *WindowsRecorder) Start(_ *entity.Region, format entity.OutputFormat) er
 	}
 
 	r.format = format
-	r.outPath = filepath.Join(os.TempDir(),
-		fmt.Sprintf("shotgo-rec-%d.mp4", time.Now().UnixNano()))
+	_ = os.MkdirAll(r.saveDir, 0o755)
+	ts := time.Now().Format("20060102_150405")
+	r.outPath = filepath.Join(r.saveDir, fmt.Sprintf("ShotGo_%s.mp4", ts))
 
 	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "gdigrab", "-framerate", "30", "-i", "desktop",
@@ -67,7 +69,6 @@ func (r *WindowsRecorder) Stop() (*entity.Recording, error) {
 	gracefulStop(r.cmd, r.stdin)
 	duration := time.Since(r.startTime)
 	r.recording = false
-	r.paused = false
 	return &entity.Recording{
 		ID:    fmt.Sprintf("rec-%d", time.Now().UnixNano()),
 		State: entity.RecordingStopped, Format: r.format,

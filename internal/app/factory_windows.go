@@ -19,12 +19,13 @@ import (
 func New() *App {
 	capturer := capture.NewWindowsCapturer()
 	ffmpegPath, _ := ffmpeg.ExtractBinary(os.TempDir() + "/shotgo")
-	rec := recorder.NewWindowsRecorder(ffmpegPath)
+	configStore, _ := storage.NewJSONConfigStore("")
+	cfg := configStore.Default()
+	rec := recorder.NewWindowsRecorder(ffmpegPath, cfg.SaveDirectory)
 	clip := clipboard.NewWindowsClipboard()
 	hotkeyMgr := hotkey.NewWindowsHotkeyManager()
 	perms := permissions.NewWindowsPermissions()
 	fileStore := storage.NewLocalFileStorage("")
-	configStore, _ := storage.NewJSONConfigStore("")
 	ffmpegClient := ffmpeg.NewClient(ffmpegPath)
 
 	return &App{

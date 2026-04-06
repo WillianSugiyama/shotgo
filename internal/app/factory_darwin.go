@@ -17,12 +17,13 @@ import (
 func New() *App {
 	capturer := capture.NewDarwinCapturer()
 	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
-	rec := recorder.NewDarwinRecorder(ffmpegPath)
+	configStore, _ := storage.NewJSONConfigStore("")
+	cfg := configStore.Default()
+	rec := recorder.NewDarwinRecorder(ffmpegPath, cfg.SaveDirectory)
 	clip := clipboard.NewDarwinClipboard()
 	hotkeyMgr := hotkey.NewDarwinHotkeyManager()
 	perms := permissions.NewDarwinPermissions()
 	fileStore := storage.NewLocalFileStorage("")
-	configStore, _ := storage.NewJSONConfigStore("")
 	ffmpegClient := ffmpeg.NewClient(ffmpegPath)
 
 	return &App{

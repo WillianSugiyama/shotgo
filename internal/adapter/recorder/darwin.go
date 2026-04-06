@@ -17,6 +17,7 @@ import (
 type DarwinRecorder struct {
 	mu         sync.Mutex
 	ffmpegPath string
+	saveDir    string
 	cmd        *exec.Cmd
 	stdin      io.WriteCloser
 	recording  bool
@@ -25,8 +26,8 @@ type DarwinRecorder struct {
 	startTime  time.Time
 }
 
-func NewDarwinRecorder(ffmpegPath string) *DarwinRecorder {
-	return &DarwinRecorder{ffmpegPath: ffmpegPath}
+func NewDarwinRecorder(ffmpegPath, saveDir string) *DarwinRecorder {
+	return &DarwinRecorder{ffmpegPath: ffmpegPath, saveDir: saveDir}
 }
 
 func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) error {
@@ -38,8 +39,9 @@ func (r *DarwinRecorder) Start(_ *entity.Region, format entity.OutputFormat) err
 
 	screenIdx := findScreenIndex(r.ffmpegPath)
 	r.format = format
-	r.outPath = filepath.Join(os.TempDir(),
-		fmt.Sprintf("shotgo-rec-%d.mp4", time.Now().UnixNano()))
+	_ = os.MkdirAll(r.saveDir, 0o755)
+	ts := time.Now().Format("20060102_150405")
+	r.outPath = filepath.Join(r.saveDir, fmt.Sprintf("ShotGo_%s.mp4", ts))
 
 	r.cmd = exec.Command(r.ffmpegPath, "-y",
 		"-f", "avfoundation", "-framerate", "30",
