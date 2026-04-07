@@ -38,3 +38,17 @@ func (a *App) SetWindowAsMain() {
 	wailsRuntime.WindowCenter(a.ctx)
 	wailsRuntime.WindowShow(a.ctx)
 }
+
+// SetWindowAsOverlay expands the window to cover the entire primary screen,
+// for region selection overlays.
+func (a *App) SetWindowAsOverlay() {
+	screens, err := wailsRuntime.ScreenGetAll(a.ctx)
+	if err != nil || len(screens) == 0 {
+		return
+	}
+	primary := screens[0]
+	wailsRuntime.WindowSetAlwaysOnTop(a.ctx, true)
+	wailsRuntime.WindowSetSize(a.ctx, primary.Size.Width, primary.Size.Height)
+	wailsRuntime.WindowSetPosition(a.ctx, 0, 0)
+	wailsRuntime.WindowShow(a.ctx)
+}

@@ -19,6 +19,7 @@ type App struct {
 
 	// Platform adapters held for direct use
 	interactiveCapturer port.InteractiveCapturer
+	scrollCapturer      ScrollCapturer
 	permissionsChecker  port.PermissionsChecker
 	hotkeyMgr           port.HotkeyManager
 

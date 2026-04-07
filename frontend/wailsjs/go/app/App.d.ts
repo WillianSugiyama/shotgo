@@ -13,6 +13,8 @@ export function CapturePreview():Promise<app.CaptureResult>;
 
 export function CaptureRegion(arg1:number,arg2:number,arg3:number,arg4:number):Promise<app.CaptureResult>;
 
+export function CaptureScrollable(arg1:number,arg2:number,arg3:number,arg4:number):Promise<app.CaptureResult>;
+
 export function CaptureWindow(arg1:string):Promise<app.CaptureResult>;
 
 export function CheckPermissions():Promise<usecase.PermissionResult>;
@@ -37,6 +39,12 @@ export function OpenPermissionsSettings():Promise<void>;
 
 export function PermissionsReady():Promise<boolean>;
 
+export function RequestAccessibility():Promise<void>;
+
+export function RequestCamera():Promise<void>;
+
+export function RequestMicrophone():Promise<void>;
+
 export function RequestScreenCapture():Promise<void>;
 
 export function RevealFile(arg1:string):Promise<void>;
@@ -50,6 +58,8 @@ export function SaveLastScreenshot(arg1:string):Promise<void>;
 export function SetWindowAsBar():Promise<void>;
 
 export function SetWindowAsMain():Promise<void>;
+
+export function SetWindowAsOverlay():Promise<void>;
 
 export function StartRecording(arg1:string):Promise<void>;
 

@@ -34,7 +34,17 @@ func (p *WindowsPermissions) RequestAccessibility() error {
 	return nil
 }
 
+func (p *WindowsPermissions) CheckMicrophone() port.PermissionStatus {
+	return port.PermissionGranted
+}
+
+func (p *WindowsPermissions) CheckCamera() port.PermissionStatus {
+	return port.PermissionGranted
+}
+
+func (p *WindowsPermissions) RequestMicrophone() error { return nil }
+func (p *WindowsPermissions) RequestCamera() error     { return nil }
+
 func (p *WindowsPermissions) OpenPermissionsSettings() error {
-	// No-op on Windows: no equivalent permissions panel needed.
 	return nil
 }

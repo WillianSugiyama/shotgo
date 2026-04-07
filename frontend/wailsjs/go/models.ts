@@ -349,6 +349,8 @@ export namespace usecase {
 	export class PermissionResult {
 	    screenCapture: string;
 	    accessibility: string;
+	    microphone: string;
+	    camera: string;
 	    allGranted: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -359,6 +361,8 @@ export namespace usecase {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.screenCapture = source["screenCapture"];
 	        this.accessibility = source["accessibility"];
+	        this.microphone = source["microphone"];
+	        this.camera = source["camera"];
 	        this.allGranted = source["allGranted"];
 	    }
 	}

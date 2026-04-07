@@ -16,6 +16,7 @@ import (
 // New creates a new App with macOS-specific adapters.
 func New() *App {
 	capturer := capture.NewDarwinCapturer()
+	scrollCap := capture.NewScrollableCapturer(capturer)
 	ffmpegPath, _ := ffmpeg.ExtractBinary("/tmp/shotgo")
 	configStore, _ := storage.NewJSONConfigStore("")
 	cfg := configStore.Default()
@@ -28,6 +29,7 @@ func New() *App {
 
 	return &App{
 		interactiveCapturer: capturer,
+		scrollCapturer:      scrollCap,
 		permissionsChecker:  perms,
 		hotkeyMgr:           hotkeyMgr,
 		ffmpegPath:          ffmpegPath,

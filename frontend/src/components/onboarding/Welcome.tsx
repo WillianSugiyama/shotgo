@@ -1,31 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAppStore } from "../../stores/appStore";
 import {
   CheckPermissions,
   RequestScreenCapture,
-  OpenPermissionsSettings,
+  RequestAccessibility,
+  RequestMicrophone,
+  RequestCamera,
   HideWindow,
 } from "../../../wailsjs/go/app/App";
 import { ArrowRight } from "lucide-react";
 import { PermissionCard } from "./PermissionCard";
 
+type PermKey = "screenCapture" | "accessibility" | "microphone" | "camera";
+
 export function Welcome() {
   const { setView, setFirstLaunch } = useAppStore();
-  const [screenOk, setScreenOk] = useState(false);
+  const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [checking, setChecking] = useState(true);
   const [checkFailed, setCheckFailed] = useState(false);
 
-  const check = async () => {
-    setChecking(true);
+  const check = useCallback(async () => {
     try {
-      const result = await CheckPermissions();
-      setScreenOk(result.screenCapture === "granted");
+      const r = await CheckPermissions();
+      setStatuses({
+        screenCapture: r.screenCapture,
+        accessibility: r.accessibility,
+        microphone: r.microphone,
+        camera: r.camera,
+      });
       setCheckFailed(false);
     } catch {
       setCheckFailed(true);
     }
     setChecking(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (!window.runtime) {
@@ -33,56 +41,59 @@ export function Welcome() {
       setCheckFailed(true);
       return;
     }
-    CheckPermissions()
-      .then((result) => {
-        if (result.screenCapture === "granted") {
-          setFirstLaunch(false);
-          HideWindow().catch(() => {});
-          setView("idle");
-        } else {
-          setScreenOk(false);
-          setChecking(false);
-        }
-      })
-      .catch(() => {
-        setChecking(false);
-        setCheckFailed(true);
-      });
-  }, []);
+    check();
+    const id = setInterval(check, 1500);
+    return () => clearInterval(id);
+  }, [check]);
 
-  const handleRequest = async () => {
-    try {
-      await RequestScreenCapture();
-    } catch {
-      /* ignore */
-    }
-    setTimeout(check, 1000);
-  };
+  const onGrant = useCallback(
+    async (key: PermKey) => {
+      try {
+        if (key === "screenCapture") await RequestScreenCapture();
+        else if (key === "accessibility") await RequestAccessibility();
+        else if (key === "microphone") await RequestMicrophone();
+        else if (key === "camera") await RequestCamera();
+      } catch {
+        /* ignore */
+      }
+      setTimeout(check, 500);
+    },
+    [check],
+  );
 
   const handleContinue = () => {
     setFirstLaunch(false);
-    if (screenOk) HideWindow().catch(() => {});
+    if (statuses.screenCapture === "granted") HideWindow().catch(() => {});
     setView("idle");
   };
 
+  const screenOk = statuses.screenCapture === "granted";
+
   return (
-    <div className="view-transition flex flex-col items-center justify-center h-full px-[32px] py-[32px]">
+    <div className="view-transition flex flex-col items-center justify-center h-full px-[32px] py-[24px]">
       <h1 className="text-[22px] font-semibold text-text tracking-tight">Welcome to ShotGo</h1>
-      <p className="text-[13px] text-text-muted mt-[4px] mb-[32px] max-w-[300px] text-center">
+      <p className="text-[13px] text-text-muted mt-[4px] mb-[8px] max-w-[300px] text-center">
         A fast, lightweight screenshot and recording tool.
       </p>
       {!checking && (
         <PermissionCard
-          screenOk={screenOk}
+          statuses={statuses as Record<string, "granted" | "denied" | "undetermined">}
           checkFailed={checkFailed}
-          onRequest={handleRequest}
-          onOpenSettings={() => OpenPermissionsSettings()}
-          onRecheck={check}
+          onGrant={onGrant}
         />
       )}
-      {checking && <p className="text-text-muted text-xs">Checking permissions...</p>}
-      <button onClick={handleContinue} className="btn-primary mt-[24px]">
-        {screenOk ? "Get Started" : "Continue anyway"} <ArrowRight size={14} />
+      {checking && <p className="text-text-muted text-xs mt-[24px]">Checking permissions...</p>}
+      <button
+        onClick={handleContinue}
+        className="btn-primary mt-[20px] mb-[12px]"
+        disabled={!screenOk && !checkFailed}
+      >
+        {screenOk
+          ? "Get Started"
+          : checkFailed
+            ? "Continue anyway"
+            : "Grant screen recording first"}{" "}
+        <ArrowRight size={14} />
       </button>
     </div>
   );

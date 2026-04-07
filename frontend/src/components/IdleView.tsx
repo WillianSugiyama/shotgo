@@ -1,10 +1,12 @@
-import { Camera, Monitor, Crop, Video, Settings } from "lucide-react";
+import { Camera, Monitor, Crop, Video, Settings, ScrollText } from "lucide-react";
 import { useAppStore } from "../stores/appStore";
 import { useCapture } from "../hooks/useCapture";
+import { useScrollCapture } from "../hooks/useScrollCapture";
 
 export function IdleView() {
   const { setView } = useAppStore();
   const { captureFullscreen, captureRegion } = useCapture();
+  const { startScrollCapture } = useScrollCapture();
 
   return (
     <div className="view-transition flex flex-col items-center justify-center h-full p-8 gap-6">
@@ -29,6 +31,11 @@ export function IdleView() {
         <BtnWrap label="Record your screen">
           <button onClick={() => setView("recorder")} className="btn-primary">
             <Video size={15} /> Record
+          </button>
+        </BtnWrap>
+        <BtnWrap label="Capture scrollable">
+          <button onClick={startScrollCapture} className="btn-primary">
+            <ScrollText size={15} /> Scroll
           </button>
         </BtnWrap>
       </div>

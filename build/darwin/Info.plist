@@ -23,6 +23,12 @@
         <string>true</string>
         <key>LSUIElement</key>
         <true/>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>ShotGo needs microphone access to record audio alongside your screen recordings.</string>
+        <key>NSCameraUsageDescription</key>
+        <string>ShotGo needs camera access to add a webcam overlay to your recordings.</string>
+        <key>NSScreenCaptureUsageDescription</key>
+        <string>ShotGo needs screen recording access to capture screenshots and videos.</string>
         <key>NSHumanReadableCopyright</key>
         <string>{{.Info.Copyright}}</string>
         {{if .Info.FileAssociations}}

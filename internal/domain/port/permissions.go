@@ -11,18 +11,15 @@ const (
 
 // PermissionsChecker defines the interface for OS permission checks.
 type PermissionsChecker interface {
-	// CheckScreenCapture checks if screen capture is allowed.
 	CheckScreenCapture() PermissionStatus
-
-	// CheckAccessibility checks if accessibility access is granted.
 	CheckAccessibility() PermissionStatus
+	CheckMicrophone() PermissionStatus
+	CheckCamera() PermissionStatus
 
-	// RequestScreenCapture prompts or guides the user to grant permission.
 	RequestScreenCapture() error
-
-	// RequestAccessibility prompts or guides the user to grant permission.
 	RequestAccessibility() error
+	RequestMicrophone() error
+	RequestCamera() error
 
-	// OpenPermissionsSettings opens the OS permissions panel.
 	OpenPermissionsSettings() error
 }

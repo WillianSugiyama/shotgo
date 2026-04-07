@@ -7,7 +7,8 @@ export type AppView =
   | "recorder"
   | "settings"
   | "onboarding"
-  | "capture-bar";
+  | "capture-bar"
+  | "scroll-region";
 
 interface AppState {
   view: AppView;

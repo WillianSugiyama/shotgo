@@ -12,7 +12,7 @@ export function CaptureBar() {
     <div className="capture-bar-root w-full h-full p-[4px] animate-[slideUp_0.25s_ease-out]">
       <div className="relative w-full h-full rounded-[16px] overflow-hidden">
         <img src={imageData} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/20 wails-drag" />
         <CornerBtn pos="top-[10px] left-[10px]" title="Pin" onClick={() => {}}>
           <Pin size={14} />
         </CornerBtn>

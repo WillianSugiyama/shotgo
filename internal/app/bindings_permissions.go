@@ -21,6 +21,22 @@ func (a *App) OpenPermissionsSettings() error {
 	return a.permissionsChecker.OpenPermissionsSettings()
 }
 
+// RequestAccessibility triggers the macOS Accessibility permission prompt.
+// Required for scrollable capture (simulating scroll wheel events).
+func (a *App) RequestAccessibility() error {
+	return a.permissionsChecker.RequestAccessibility()
+}
+
+// RequestMicrophone triggers the microphone permission prompt (for audio recording).
+func (a *App) RequestMicrophone() error {
+	return a.permissionsChecker.RequestMicrophone()
+}
+
+// RequestCamera triggers the camera permission prompt (for webcam overlay).
+func (a *App) RequestCamera() error {
+	return a.permissionsChecker.RequestCamera()
+}
+
 // CopyLastToClipboard copies the last captured screenshot to clipboard.
 func (a *App) CopyLastToClipboard() error {
 	if a.lastScreenshot == nil {

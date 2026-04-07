@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
+import { SetWindowAsMain } from "../../wailsjs/go/app/App";
 import { useCapture } from "./useCapture";
 import { useRecording } from "./useRecording";
+import { useAppStore } from "../stores/appStore";
 
-/**
- * Listens for global hotkey events emitted from the Go backend
- * and dispatches the corresponding capture/recording actions.
- */
 export function useHotkeyEvents() {
   const { captureFullscreen, captureRegion } = useCapture();
-  const { start: startRecording, stop: stopRecording } = useRecording();
+  const { stop: stopRecording } = useRecording();
+  const { setView } = useAppStore();
 
   useEffect(() => {
     if (!window.runtime) return;
@@ -22,18 +21,17 @@ export function useHotkeyEvents() {
           captureRegion();
           break;
         case "start_recording":
-          startRecording();
+          SetWindowAsMain().catch(() => {});
+          setView("recorder");
           break;
         case "stop_recording":
           stopRecording();
           break;
-        default:
-          console.warn("Unknown hotkey action:", action);
       }
     });
 
     return () => {
       cancel();
     };
-  }, [captureFullscreen, captureRegion, startRecording, stopRecording]);
+  }, [captureFullscreen, captureRegion, stopRecording, setView]);
 }

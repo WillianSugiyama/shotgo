@@ -6,27 +6,28 @@ import "shotgo/internal/domain/port"
 type PermissionResult struct {
 	ScreenCapture port.PermissionStatus `json:"screenCapture"`
 	Accessibility port.PermissionStatus `json:"accessibility"`
+	Microphone    port.PermissionStatus `json:"microphone"`
+	Camera        port.PermissionStatus `json:"camera"`
 	AllGranted    bool                  `json:"allGranted"`
 }
 
-// CheckPermissions verifies all required OS permissions.
 type CheckPermissions struct {
 	checker port.PermissionsChecker
 }
 
-// NewCheckPermissions creates a new CheckPermissions use case.
 func NewCheckPermissions(c port.PermissionsChecker) *CheckPermissions {
 	return &CheckPermissions{checker: c}
 }
 
-// Execute checks all permissions and returns their status.
+// Execute checks all permissions. Only ScreenCapture is strictly required.
+// Accessibility/Microphone/Camera are optional and only block specific features.
 func (uc *CheckPermissions) Execute() *PermissionResult {
 	sc := uc.checker.CheckScreenCapture()
-	acc := uc.checker.CheckAccessibility()
-
 	return &PermissionResult{
 		ScreenCapture: sc,
-		Accessibility: acc,
-		AllGranted:    sc == port.PermissionGranted && acc == port.PermissionGranted,
+		Accessibility: uc.checker.CheckAccessibility(),
+		Microphone:    uc.checker.CheckMicrophone(),
+		Camera:        uc.checker.CheckCamera(),
+		AllGranted:    sc == port.PermissionGranted,
 	}
 }

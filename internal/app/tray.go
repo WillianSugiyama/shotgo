@@ -47,6 +47,12 @@ func setupTray() {
 		item.OnClick(func(_ remotray.MenuItem) { fn() })
 	}
 
+	add("Open ShotGo", func() {
+		if globalApp != nil {
+			globalApp.showWindow()
+			globalApp.emitAction("open-main")
+		}
+	})
 	add("Capture Fullscreen", func() {
 		if globalApp != nil {
 			globalApp.emitAction("capture-fullscreen")
@@ -55,6 +61,12 @@ func setupTray() {
 	add("Capture Region", func() {
 		if globalApp != nil {
 			globalApp.emitAction("capture-region")
+		}
+	})
+	add("Scroll Capture", func() {
+		if globalApp != nil {
+			globalApp.showWindow()
+			globalApp.emitAction("scroll-capture")
 		}
 	})
 	add("Record Screen", func() {

@@ -18,6 +18,10 @@ export function CaptureRegion(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['CaptureRegion'](arg1, arg2, arg3, arg4);
 }
 
+export function CaptureScrollable(arg1, arg2, arg3, arg4) {
+  return window['go']['app']['App']['CaptureScrollable'](arg1, arg2, arg3, arg4);
+}
+
 export function CaptureWindow(arg1) {
   return window['go']['app']['App']['CaptureWindow'](arg1);
 }
@@ -66,6 +70,18 @@ export function PermissionsReady() {
   return window['go']['app']['App']['PermissionsReady']();
 }
 
+export function RequestAccessibility() {
+  return window['go']['app']['App']['RequestAccessibility']();
+}
+
+export function RequestCamera() {
+  return window['go']['app']['App']['RequestCamera']();
+}
+
+export function RequestMicrophone() {
+  return window['go']['app']['App']['RequestMicrophone']();
+}
+
 export function RequestScreenCapture() {
   return window['go']['app']['App']['RequestScreenCapture']();
 }
@@ -92,6 +108,10 @@ export function SetWindowAsBar() {
 
 export function SetWindowAsMain() {
   return window['go']['app']['App']['SetWindowAsMain']();
+}
+
+export function SetWindowAsOverlay() {
+  return window['go']['app']['App']['SetWindowAsOverlay']();
 }
 
 export function StartRecording(arg1) {
