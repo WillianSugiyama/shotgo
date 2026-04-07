@@ -13,9 +13,8 @@ func (a *App) CaptureInteractive() (*CaptureResult, error) {
 	time.Sleep(300 * time.Millisecond)
 
 	shot, err := a.interactiveCapturer.CaptureInteractive()
-
-	wailsRuntime.WindowShow(a.ctx)
 	if err != nil {
+		wailsRuntime.WindowShow(a.ctx)
 		return nil, err
 	}
 	a.lastScreenshot = shot

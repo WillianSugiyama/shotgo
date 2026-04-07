@@ -1,39 +1,46 @@
 import { useCallback } from "react";
 import { useCaptureStore } from "../stores/captureStore";
 import { useAppStore } from "../stores/appStore";
-import { CaptureFullscreen, CaptureInteractive } from "../../wailsjs/go/app/App";
+import { CaptureFullscreen, CaptureInteractive, SetWindowAsBar } from "../../wailsjs/go/app/App";
 
 export function useCapture() {
   const { setCapturing, setImageData, setMode, reset } = useCaptureStore();
   const { setView } = useAppStore();
+
+  const showBar = useCallback(
+    async (result: { imageBase64: string }) => {
+      setImageData(result.imageBase64);
+      setView("capture-bar");
+      await SetWindowAsBar().catch(() => {});
+    },
+    [setImageData, setView],
+  );
 
   const captureFullscreen = useCallback(async () => {
     setMode("fullscreen");
     setCapturing(true);
     try {
       const result = await CaptureFullscreen();
-      setImageData(result.imageBase64);
-      setView("editor");
+      await showBar(result);
     } catch (err) {
-      console.error("Fullscreen capture failed:", err);
+      void err;
     } finally {
       setCapturing(false);
     }
-  }, [setMode, setCapturing, setImageData, setView]);
+  }, [setMode, setCapturing, showBar]);
 
   const captureRegion = useCallback(async () => {
     setMode("region");
     setCapturing(true);
     try {
       const result = await CaptureInteractive();
-      setImageData(result.imageBase64);
-      setView("editor");
+      await showBar(result);
     } catch (err) {
-      console.error("Region capture failed:", err);
+      void err;
     } finally {
       setCapturing(false);
     }
-  }, [setMode, setCapturing, setImageData, setView]);
+  }, [setMode, setCapturing, showBar]);
 
   const cancelCapture = useCallback(() => {
     reset();

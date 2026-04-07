@@ -47,6 +47,10 @@ export function SaveDir():Promise<string>;
 
 export function SaveLastScreenshot(arg1:string):Promise<void>;
 
+export function SetWindowAsBar():Promise<void>;
+
+export function SetWindowAsMain():Promise<void>;
+
 export function StartRecording(arg1:string):Promise<void>;
 
 export function StopRecording():Promise<void>;

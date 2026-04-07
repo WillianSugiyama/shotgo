@@ -66,9 +66,9 @@ export function Welcome() {
   };
 
   return (
-    <div className="view-transition flex flex-col items-center justify-center min-h-screen bg-bg p-8">
-      <h1 className="text-[22px] font-semibold text-text">Welcome to ShotGo</h1>
-      <p className="text-[13px] text-text-muted mt-1 max-w-[300px]">
+    <div className="view-transition flex flex-col items-center justify-center h-full px-[32px] py-[32px]">
+      <h1 className="text-[22px] font-semibold text-text tracking-tight">Welcome to ShotGo</h1>
+      <p className="text-[13px] text-text-muted mt-[4px] mb-[32px] max-w-[300px] text-center">
         A fast, lightweight screenshot and recording tool.
       </p>
       {!checking && (
@@ -81,7 +81,7 @@ export function Welcome() {
         />
       )}
       {checking && <p className="text-text-muted text-xs">Checking permissions...</p>}
-      <button onClick={handleContinue} className="btn-primary mt-6">
+      <button onClick={handleContinue} className="btn-primary mt-[24px]">
         {screenOk ? "Get Started" : "Continue anyway"} <ArrowRight size={14} />
       </button>
     </div>

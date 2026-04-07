@@ -35,59 +35,56 @@
 	--transition-normal: all 0.25s ease;
 }
 
-/* Base resets */
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
+/* Base overrides — must be in @layer base to not override Tailwind utilities */
+@layer base {
+	html,
+	body,
+	#root {
+		height: 100%;
+		width: 100%;
+		background: transparent;
+		font-family: var(--font-body);
+		color: var(--color-text);
+		overflow: hidden;
+		-webkit-user-select: none;
+		user-select: none;
+	}
 
-html,
-body,
-#root {
-	height: 100%;
-	width: 100%;
-	background: var(--color-bg);
-	font-family: var(--font-body);
-	color: var(--color-text);
-	overflow: hidden;
-	-webkit-user-select: none;
-	user-select: none;
-}
+	button {
+		font-family: inherit;
+		transition: var(--transition-fast);
+	}
 
-button {
-	font-family: inherit;
-	transition: var(--transition-fast);
-}
+	button:active {
+		transform: scale(0.97);
+	}
 
-button:hover {
-	opacity: 0.9;
-}
+	button:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
 
-button:active {
-	transform: scale(0.97);
-}
+	input,
+	select {
+		font-family: inherit;
+	}
 
-button:focus-visible {
-	outline: 2px solid var(--color-accent);
-	outline-offset: 2px;
-}
-
-input,
-select {
-	font-family: inherit;
-}
-
-input:focus-visible,
-select:focus-visible {
-	outline: 2px solid var(--color-accent);
-	outline-offset: 1px;
+	input:focus-visible,
+	select:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 1px;
+	}
 }
 
 /* Animations */
 @keyframes fadeIn {
 	from { opacity: 0; }
 	to { opacity: 1; }
+}
+
+@keyframes slideUp {
+	from { opacity: 0; transform: translateY(20px) scale(0.95); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes pulse {
@@ -105,10 +102,6 @@ select:focus-visible {
 	50% { opacity: 0.4; }
 }
 
-.view-transition {
-	animation: fadeIn 0.2s ease;
-}
-
 /* Shared button base */
 @utility btn-base {
 	display: inline-flex;
@@ -124,33 +117,40 @@ select:focus-visible {
 	transition: var(--transition-fast);
 }
 
-/* Button variants */
-.btn-primary {
-	@apply btn-base bg-accent text-white hover:bg-accent-hover;
-}
+@layer components {
+	.view-transition {
+		animation: fadeIn 0.2s ease;
+	}
 
-.btn-secondary {
-	@apply btn-base bg-surface text-text border border-border
-		hover:bg-surface-hover;
-}
+	.wails-drag {
+		--wails-draggable: drag;
+	}
 
-.btn-danger {
-	@apply btn-base bg-danger text-white hover:opacity-90;
-}
+	.btn-primary {
+		@apply btn-base bg-accent text-white hover:bg-accent-hover;
+	}
 
-.btn-ghost {
-	@apply btn-base bg-transparent text-text-muted hover:bg-surface-hover;
-	padding: 0.5rem 0.75rem;
-}
+	.btn-secondary {
+		@apply btn-base bg-surface text-text border border-border
+			hover:bg-surface-hover;
+	}
 
-/* Form inputs for settings */
-.settings-input {
-	@apply block w-full px-3 py-2 mb-2 bg-bg text-text
-		border border-border rounded-sm font-body text-sm;
-}
+	.btn-danger {
+		@apply btn-base bg-danger text-white hover:opacity-90;
+	}
 
-/* Keyboard shortcut badge */
-.hotkey-input {
-	@apply px-3 py-1 text-xs font-mono bg-bg text-text
-		border border-border rounded-sm cursor-pointer;
+	.btn-ghost {
+		@apply btn-base bg-transparent text-text-muted hover:bg-surface-hover;
+		padding: 0.5rem 0.75rem;
+	}
+
+	.settings-input {
+		@apply block w-full px-3 py-2 mb-2 bg-bg text-text
+			border border-border rounded-sm font-body text-sm;
+	}
+
+	.hotkey-input {
+		@apply px-3 py-1 text-xs font-mono bg-bg text-text
+			border border-border rounded-sm cursor-pointer;
+	}
 }

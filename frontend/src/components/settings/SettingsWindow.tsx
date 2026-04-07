@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Monitor, Keyboard, Check } from "lucide-react";
+import { Monitor, Keyboard, Check } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { useAppStore } from "../../stores/appStore";
 import { HotkeyConfig } from "./HotkeyConfig";
@@ -24,15 +24,7 @@ export function SettingsWindow() {
   };
 
   return (
-    <div className="view-transition p-6 text-text max-w-[520px] mx-auto overflow-y-auto max-h-screen animate-[fadeIn_0.2s_ease]">
-      <div className="flex items-center gap-2 mb-6">
-        <button onClick={() => setView("idle")} className="btn-ghost text-text text-sm font-medium">
-          <ArrowLeft size={18} /> Back
-        </button>
-        <div className="flex-1" />
-        <h2 className="text-xl font-semibold text-text">Settings</h2>
-        <div className="flex-1" />
-      </div>
+    <div className="view-transition p-6 max-w-[520px] mx-auto overflow-y-auto h-full">
       <OutputSection
         saveDirectory={s.saveDirectory}
         setSaveDirectory={s.setSaveDirectory}

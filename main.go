@@ -9,6 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
 )
 
 //go:embed all:frontend/dist
@@ -24,7 +25,8 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour:  &options.RGBA{R: 18, G: 18, B: 24, A: 1},
+		BackgroundColour:  &options.RGBA{R: 0, G: 0, B: 0, A: 0},
+		Frameless:         true,
 		StartHidden:       true,
 		HideWindowOnClose: true,
 		OnStartup:         application.Startup,
@@ -32,6 +34,11 @@ func main() {
 		Menu:              application.CreateMenu(),
 		Bind: []interface{}{
 			application,
+		},
+		Mac: &mac.Options{
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  false,
+			TitleBar:             mac.TitleBarHidden(),
 		},
 	})
 	if err != nil {

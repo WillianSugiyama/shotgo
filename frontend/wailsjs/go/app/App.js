@@ -86,6 +86,14 @@ export function SaveLastScreenshot(arg1) {
   return window['go']['app']['App']['SaveLastScreenshot'](arg1);
 }
 
+export function SetWindowAsBar() {
+  return window['go']['app']['App']['SetWindowAsBar']();
+}
+
+export function SetWindowAsMain() {
+  return window['go']['app']['App']['SetWindowAsMain']();
+}
+
 export function StartRecording(arg1) {
   return window['go']['app']['App']['StartRecording'](arg1);
 }

@@ -27,9 +27,11 @@ export function RecorderControls() {
     </button>
   );
 
+  const wrap = "relative flex flex-col items-center justify-center h-full gap-6";
+
   if (state === "idle") {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
+      <div className={wrap}>
         {backBtn}
         <SourcePicker onSelect={(src) => start(src)} />
       </div>
@@ -38,7 +40,7 @@ export function RecorderControls() {
 
   if (state === "stopped") {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
+      <div className={wrap}>
         {backBtn}
         <RecordingPreview />
       </div>
@@ -46,7 +48,7 @@ export function RecorderControls() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-6 bg-bg">
+    <div className={wrap}>
       {backBtn}
       <div className={isRec ? "rounded-lg border-2 border-recording p-6 bg-recording/5" : "p-6"}>
         <div className="flex items-center gap-2 justify-center">

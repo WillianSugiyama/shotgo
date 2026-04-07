@@ -20,31 +20,30 @@ type CaptureResult struct {
 	Source      string `json:"source"`
 }
 
-// CaptureFullscreen hides the window, captures, then shows the editor.
+// CaptureFullscreen hides the window, captures, returns result.
+// The frontend decides how to show the window (bar or main).
 func (a *App) CaptureFullscreen() (*CaptureResult, error) {
 	wailsRuntime.WindowHide(a.ctx)
 	time.Sleep(300 * time.Millisecond)
 
 	shot, err := a.captureFullscreen.Execute()
-
-	wailsRuntime.WindowShow(a.ctx)
 	if err != nil {
+		wailsRuntime.WindowShow(a.ctx)
 		return nil, err
 	}
 	a.lastScreenshot = shot
 	return toCaptureResult(shot), nil
 }
 
-// CaptureRegion hides the window, captures the region, then shows editor.
+// CaptureRegion hides the window, captures the region, returns result.
 func (a *App) CaptureRegion(x, y, width, height int) (*CaptureResult, error) {
 	wailsRuntime.WindowHide(a.ctx)
 	time.Sleep(300 * time.Millisecond)
 
 	region := entity.Region{X: x, Y: y, Width: width, Height: height}
 	shot, err := a.captureRegion.Execute(region)
-
-	wailsRuntime.WindowShow(a.ctx)
 	if err != nil {
+		wailsRuntime.WindowShow(a.ctx)
 		return nil, err
 	}
 	a.lastScreenshot = shot

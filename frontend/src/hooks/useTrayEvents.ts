@@ -1,13 +1,10 @@
 import { useEffect } from "react";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
+import { SetWindowAsMain } from "../../wailsjs/go/app/App";
 import { useCapture } from "./useCapture";
 import { useRecording } from "./useRecording";
 import { useAppStore } from "../stores/appStore";
 
-/**
- * Listens for system tray menu actions emitted from Go via Wails events
- * and dispatches them to the appropriate hooks/stores.
- */
 export function useTrayEvents() {
   const { captureFullscreen, captureRegion } = useCapture();
   const { start: startRecording } = useRecording();
@@ -24,17 +21,18 @@ export function useTrayEvents() {
           captureRegion();
           break;
         case "record-screen":
+          SetWindowAsMain().catch(() => {});
           setView("recorder");
           startRecording();
           break;
         case "settings":
+          SetWindowAsMain().catch(() => {});
           setView("settings");
           break;
         case "quit":
-          // Wails handles the actual quit on the Go side
           break;
         default:
-          console.warn("Unknown tray action:", action);
+          void action;
       }
     });
 
