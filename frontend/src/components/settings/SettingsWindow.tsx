@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Monitor, Keyboard, Check } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { useAppStore } from "../../stores/appStore";
+import { useEscape } from "../../hooks/useEscape";
 import { HotkeyConfig } from "./HotkeyConfig";
 import { OutputSection } from "./OutputSection";
 
@@ -9,6 +10,9 @@ export function SettingsWindow() {
   const { setView } = useAppStore();
   const s = useSettings();
   const [saved, setSaved] = useState(false);
+
+  const goBack = useCallback(() => setView("idle"), [setView]);
+  useEscape(goBack);
 
   useEffect(() => {
     s.loadSettings();
@@ -24,7 +28,13 @@ export function SettingsWindow() {
   };
 
   return (
-    <div className="view-transition p-6 max-w-[520px] mx-auto overflow-y-auto h-full">
+    <div className="view-transition view-pad max-w-[520px] mx-auto overflow-y-auto h-full bg-black">
+      <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-accent mb-[6px]">
+        ▶ Settings
+      </div>
+      <h1 className="text-[20px] font-black text-white tracking-tight uppercase mb-[20px]">
+        Preferences
+      </h1>
       <OutputSection
         saveDirectory={s.saveDirectory}
         setSaveDirectory={s.setSaveDirectory}
@@ -33,8 +43,8 @@ export function SettingsWindow() {
         recordFormat={s.recordFormat}
         setRecordFormat={s.setRecordFormat}
       />
-      <Section title="System" icon={<Monitor size={15} />}>
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <Section title="System" icon={<Monitor size={13} />}>
+        <label className="flex items-center gap-[10px] text-[12px] text-white cursor-pointer">
           <input
             type="checkbox"
             checked={s.launchAtStartup}
@@ -43,13 +53,13 @@ export function SettingsWindow() {
           Launch at startup
         </label>
       </Section>
-      <Section title="Hotkeys" icon={<Keyboard size={15} />}>
+      <Section title="Hotkeys" icon={<Keyboard size={13} />}>
         <HotkeyConfig />
       </Section>
-      <button onClick={onSave} className="btn-primary w-full justify-center">
+      <button onClick={onSave} className="btn-primary w-full justify-center mt-[8px]">
         {saved ? (
           <>
-            <Check size={14} /> Saved!
+            <Check size={14} /> Saved
           </>
         ) : (
           "Save"
@@ -69,11 +79,14 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="p-4 mb-4 bg-surface rounded-lg border border-border">
-      <div className="flex items-center gap-2 text-[13px] font-semibold text-text-muted uppercase tracking-wider mb-4">
-        {icon} {title}
+    <div className="bg-black border border-white/15 mb-[12px]">
+      <div className="px-[14px] py-[8px] border-b border-white/15 flex items-center gap-[8px]">
+        <div className="text-accent">{icon}</div>
+        <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-white/70">
+          {title}
+        </span>
       </div>
-      {children}
+      <div className="px-[14px] py-[12px]">{children}</div>
     </div>
   );
 }

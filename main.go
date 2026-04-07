@@ -20,8 +20,8 @@ func main() {
 
 	err := wails.Run(&options.App{
 		Title:  "ShotGo",
-		Width:  800,
-		Height: 600,
+		Width:  812,
+		Height: 612,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

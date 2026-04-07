@@ -1,79 +1,61 @@
-import { useState, useCallback, useRef } from "react";
-import { EditorTool } from "../components/editor/Toolbar";
-import { ArrowData } from "../components/editor/tools/ArrowTool";
-import { TextData } from "../components/editor/tools/TextTool";
-import { BlurData } from "../components/editor/tools/BlurTool";
+import { useState, useCallback } from "react";
+import type { EditorTool } from "../components/editor/Toolbar";
+import type { TextData } from "../components/editor/tools/TextTool";
+import { useEditorDrag } from "./useEditorDrag";
+import type { Annotation, PendingText, CropRect } from "./useEditorTools.types";
 
-export interface Annotation {
-  type: "arrow" | "text" | "blur";
-  data: ArrowData | TextData | BlurData;
-}
+export type { Annotation, DragState, PendingText, CropRect } from "./useEditorTools.types";
 
 export function useEditorTools() {
   const [activeTool, setActiveTool] = useState<EditorTool>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
-  const isDragging = useRef(false);
-  const dragStart = useRef({ x: 0, y: 0 });
+  const [pendingText, setPendingText] = useState<PendingText | null>(null);
+  const [cropRect, setCropRect] = useState<CropRect | null>(null);
 
-  const handleMouseDown = useCallback(
-    (x: number, y: number) => {
-      if (!activeTool || activeTool === "crop") return;
-      isDragging.current = true;
-      dragStart.current = { x, y };
+  const { drag, onDown, onMove, onUp } = useEditorDrag({
+    activeTool,
+    setPendingText,
+    setAnnotations,
+    setCropRect,
+  });
 
-      if (activeTool === "text") {
-        const text = prompt("Enter text:");
-        if (text) {
-          const data: TextData = {
-            x,
-            y,
-            content: text,
-            fontSize: 16,
-            color: "#ff0000",
-            fontFamily: "sans-serif",
-          };
-          setAnnotations((prev) => [...prev, { type: "text", data }]);
-        }
-        isDragging.current = false;
+  const commitText = useCallback(
+    (text: string) => {
+      if (!pendingText || !text) {
+        setPendingText(null);
+        return;
       }
+      const data: TextData = {
+        x: pendingText.x,
+        y: pendingText.y,
+        content: text,
+        fontSize: 22,
+        color: "#6c5ce7",
+        fontFamily: "sans-serif",
+      };
+      setAnnotations((p) => [...p, { type: "text", data }]);
+      setPendingText(null);
     },
-    [activeTool],
+    [pendingText],
   );
 
-  const handleMouseUp = useCallback(
-    (x: number, y: number) => {
-      if (!isDragging.current || !activeTool) return;
-      isDragging.current = false;
-      const sx = dragStart.current.x;
-      const sy = dragStart.current.y;
+  const cancelText = useCallback(() => setPendingText(null), []);
+  const clearCrop = useCallback(() => setCropRect(null), []);
+  const undo = useCallback(() => setAnnotations((p) => p.slice(0, -1)), []);
 
-      if (activeTool === "arrow") {
-        const data: ArrowData = {
-          startX: sx,
-          startY: sy,
-          endX: x,
-          endY: y,
-          color: "#ff0000",
-          width: 3,
-        };
-        setAnnotations((prev) => [...prev, { type: "arrow", data }]);
-      } else if (activeTool === "blur") {
-        const data: BlurData = {
-          x: Math.min(sx, x),
-          y: Math.min(sy, y),
-          width: Math.abs(x - sx),
-          height: Math.abs(y - sy),
-          intensity: 10,
-        };
-        setAnnotations((prev) => [...prev, { type: "blur", data }]);
-      }
-    },
-    [activeTool],
-  );
-
-  const undo = useCallback(() => {
-    setAnnotations((prev) => prev.slice(0, -1));
-  }, []);
-
-  return { activeTool, setActiveTool, annotations, handleMouseDown, handleMouseUp, undo };
+  return {
+    activeTool,
+    setActiveTool,
+    annotations,
+    drag,
+    pendingText,
+    cropRect,
+    handleMouseDown: onDown,
+    handleMouseMove: onMove,
+    handleMouseUp: onUp,
+    commitText,
+    cancelText,
+    clearCrop,
+    undo,
+  };
 }

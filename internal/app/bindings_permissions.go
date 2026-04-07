@@ -1,10 +1,20 @@
 package app
 
 import (
+	"encoding/base64"
 	"errors"
+	"strings"
 
 	"shotgo/internal/usecase"
 )
+
+func decodeDataURL(dataURL string) ([]byte, error) {
+	idx := strings.Index(dataURL, ",")
+	if idx < 0 {
+		return nil, errors.New("invalid data URL")
+	}
+	return base64.StdEncoding.DecodeString(dataURL[idx+1:])
+}
 
 // CheckPermissions verifies all required OS permissions.
 func (a *App) CheckPermissions() *usecase.PermissionResult {
@@ -51,4 +61,18 @@ func (a *App) SaveLastScreenshot(path string) error {
 		return errors.New("no screenshot to save")
 	}
 	return a.saveScreenshot.Execute(a.lastScreenshot, path)
+}
+
+// UpdateLastScreenshot replaces lastScreenshot data with edited PNG bytes
+// (data URL base64 from the frontend editor).
+func (a *App) UpdateLastScreenshot(dataURL string) error {
+	if a.lastScreenshot == nil {
+		return errors.New("no screenshot to update")
+	}
+	raw, err := decodeDataURL(dataURL)
+	if err != nil {
+		return err
+	}
+	a.lastScreenshot.Data = raw
+	return nil
 }

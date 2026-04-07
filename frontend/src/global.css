@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-	/* Colors */
-	--color-bg: #121218;
-	--color-surface: #1c1c26;
-	--color-surface-hover: #26263a;
-	--color-border: #2e2e42;
-	--color-text: #e8e8ed;
-	--color-text-muted: #8888a0;
+	/* Brutalist palette — purple accent */
+	--color-bg: #000000;
+	--color-surface: #0a0a0a;
+	--color-surface-hover: #161616;
+	--color-border: rgba(255, 255, 255, 0.12);
+	--color-text: #ffffff;
+	--color-text-muted: rgba(255, 255, 255, 0.5);
 	--color-accent: #6c5ce7;
-	--color-accent-hover: #7e70ef;
-	--color-accent-subtle: rgba(108, 92, 231, 0.12);
-	--color-success: #00c9a7;
-	--color-danger: #ff6b6b;
-	--color-danger-subtle: rgba(255, 107, 107, 0.12);
-	--color-warning: #feca57;
-	--color-recording: #ff4757;
-	--color-selection: #4a90d9;
-	--color-selection-subtle: rgba(74, 144, 217, 0.1);
+	--color-accent-hover: #8270f0;
+	--color-accent-subtle: rgba(108, 92, 231, 0.15);
+	--color-success: #30d158;
+	--color-danger: #ff3b30;
+	--color-danger-subtle: rgba(255, 59, 48, 0.12);
+	--color-warning: #ffd60a;
+	--color-recording: #ff3b30;
+	--color-selection: #6c5ce7;
+	--color-selection-subtle: rgba(108, 92, 231, 0.18);
 
-	/* Radius */
-	--radius-sm: 4px;
-	--radius-md: 8px;
-	--radius-lg: 12px;
-	--radius-pill: 999px;
+	/* Sharp corners */
+	--radius-sm: 0px;
+	--radius-md: 0px;
+	--radius-lg: 0px;
+	--radius-pill: 0px;
 
 	/* Font families */
 	--font-mono: "SF Mono", "Fira Code", monospace;
@@ -50,6 +50,10 @@
 		user-select: none;
 	}
 
+	#root:has(.window-shell) {
+		padding: 6px;
+	}
+
 	button {
 		font-family: inherit;
 		transition: var(--transition-fast);
@@ -59,9 +63,11 @@
 		transform: scale(0.97);
 	}
 
-	button:focus-visible {
+	button:focus-visible,
+	a:focus-visible,
+	[tabindex]:focus-visible {
 		outline: 2px solid var(--color-accent);
-		outline-offset: 2px;
+		outline-offset: 0;
 	}
 
 	input,
@@ -87,6 +93,17 @@
 	to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes slideUpSnap {
+	0% { opacity: 0; transform: translateY(40px); }
+	60% { opacity: 1; transform: translateY(-4px); }
+	100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flashAccent {
+	0%, 100% { background: transparent; }
+	50% { background: rgba(255, 59, 48, 0.15); }
+}
+
 @keyframes pulse {
 	0%, 100% { opacity: 1; }
 	50% { opacity: 0.5; }
@@ -107,14 +124,16 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	border-radius: var(--radius-md);
+	border-radius: 0;
 	padding: 0.625rem 1.25rem;
-	font-size: 0.875rem;
-	font-weight: 500;
+	font-size: 0.8125rem;
+	font-weight: 700;
 	border: none;
 	cursor: pointer;
 	outline: none;
 	transition: var(--transition-fast);
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
 }
 
 @layer components {
@@ -124,6 +143,65 @@
 
 	.wails-drag {
 		--wails-draggable: drag;
+	}
+
+	.window-shell {
+		background: #000;
+		box-shadow:
+			0 0 0 0.5px rgba(255, 255, 255, 0.08),
+			0 20px 60px -10px rgba(0, 0, 0, 0.8);
+	}
+
+	.view-pad {
+		padding: 24px 32px;
+	}
+
+	.shotgo-logo-mark {
+		filter: brightness(0) saturate(100%) invert(45%) sepia(73%) saturate(2618%)
+			hue-rotate(229deg) brightness(92%) contrast(94%);
+	}
+
+	.traffic-light {
+		width: 12px;
+		height: 12px;
+		border-radius: 9999px;
+		border: 0.5px solid rgba(0, 0, 0, 0.25);
+		cursor: pointer;
+		box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.15);
+		transition: filter 0.1s ease;
+	}
+
+	.traffic-light:hover {
+		filter: brightness(1.1);
+	}
+
+	.traffic-light:active {
+		filter: brightness(0.85);
+	}
+
+	.hero-action {
+		transition: background 0.1s ease;
+	}
+
+	.hero-action:hover {
+		background: #ff3b30;
+	}
+
+	.hero-action:hover .hero-label {
+		color: #000;
+	}
+
+	.hero-action:hover .hero-sub {
+		color: rgba(0, 0, 0, 0.7);
+	}
+
+	.hero-action:hover .hero-tag {
+		color: #000;
+	}
+
+	.hero-action:hover .hero-kbd {
+		color: #000;
+		border-color: rgba(0, 0, 0, 0.4);
 	}
 
 	.btn-primary {
@@ -145,12 +223,36 @@
 	}
 
 	.settings-input {
-		@apply block w-full px-3 py-2 mb-2 bg-bg text-text
-			border border-border rounded-sm font-body text-sm;
+		@apply block w-full px-[10px] py-[8px] mb-[8px] bg-black text-white
+			border border-white/15 font-mono text-[12px] uppercase tracking-[0.05em];
+	}
+
+	.settings-input:focus {
+		@apply border-accent outline-none;
+	}
+
+	select.settings-input {
+		appearance: none;
+		-webkit-appearance: none;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path fill='%236c5ce7' d='M0 2 L5 8 L10 2 Z'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 10px center;
+		padding-right: 28px;
+		cursor: pointer;
+	}
+
+	select.settings-input option {
+		background: #000;
+		color: #fff;
+		font-family: var(--font-mono);
 	}
 
 	.hotkey-input {
-		@apply px-3 py-1 text-xs font-mono bg-bg text-text
-			border border-border rounded-sm cursor-pointer;
+		@apply px-[10px] py-[4px] text-[11px] font-mono bg-black text-white
+			border border-white/15 cursor-pointer;
+	}
+
+	.hotkey-input:hover {
+		@apply border-accent;
 	}
 }

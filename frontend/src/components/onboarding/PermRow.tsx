@@ -1,4 +1,4 @@
-import { CheckCircle } from "lucide-react";
+import { Check } from "lucide-react";
 import type { Perm, Status } from "./permissionList";
 
 interface Props {
@@ -10,19 +10,24 @@ interface Props {
 export function PermRow({ perm, status, onGrant }: Props) {
   const granted = status === "granted";
   return (
-    <div className="flex items-center gap-[12px] p-[10px] rounded-md bg-bg/50">
-      <div className={granted ? "text-success" : "text-text-muted"}>{perm.icon}</div>
+    <div className="flex items-center gap-[12px] px-[16px] py-[12px] border-b border-white/8 last:border-b-0">
+      <div className={granted ? "text-accent" : "text-white/40"}>{perm.icon}</div>
       <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-medium text-text flex items-center gap-[6px]">
+        <div className="text-[12px] font-bold text-white uppercase tracking-tight flex items-center gap-[8px]">
           {perm.label}
-          {perm.required && <span className="text-[10px] text-danger font-semibold">REQUIRED</span>}
+          {perm.required && <span className="text-[9px] text-accent font-mono">REQUIRED</span>}
         </div>
-        <div className="text-[11px] text-text-muted truncate">{perm.description}</div>
+        <div className="text-[10px] text-white/50 truncate mt-[2px]">{perm.description}</div>
       </div>
       {granted ? (
-        <CheckCircle size={18} className="text-success shrink-0" />
+        <div className="w-[24px] h-[24px] bg-accent flex items-center justify-center shrink-0">
+          <Check size={14} className="text-black" strokeWidth={3} />
+        </div>
       ) : (
-        <button onClick={onGrant} className="btn-primary text-[11px] px-[12px] py-[6px] shrink-0">
+        <button
+          onClick={onGrant}
+          className="text-[10px] font-bold text-black bg-accent px-[10px] py-[5px] uppercase tracking-tight border-none cursor-pointer shrink-0 hover:bg-white"
+        >
           Grant
         </button>
       )}

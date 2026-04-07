@@ -33,6 +33,8 @@ export function ListWindows():Promise<Array<app.WindowInfo>>;
 
 export function LoadConfig():Promise<port.AppConfig>;
 
+export function Notify(arg1:string,arg2:string):Promise<void>;
+
 export function OpenFile(arg1:string):Promise<void>;
 
 export function OpenPermissionsSettings():Promise<void>;
@@ -64,3 +66,5 @@ export function SetWindowAsOverlay():Promise<void>;
 export function StartRecording(arg1:string):Promise<void>;
 
 export function StopRecording():Promise<void>;
+
+export function UpdateLastScreenshot(arg1:string):Promise<void>;

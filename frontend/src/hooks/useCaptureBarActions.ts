@@ -1,18 +1,17 @@
 import { useCallback } from "react";
 import { useAppStore } from "../stores/appStore";
 import { useCaptureStore } from "../stores/captureStore";
-import { useToastStore } from "../stores/toastStore";
 import {
   SaveLastScreenshot,
   CopyLastToClipboard,
   SetWindowAsMain,
   HideWindow,
+  Notify,
 } from "../../wailsjs/go/app/App";
 
 export function useCaptureBarActions() {
   const { setView } = useAppStore();
   const reset = useCaptureStore((s) => s.reset);
-  const toast = useToastStore((s) => s.show);
 
   const dismiss = useCallback(async () => {
     reset();
@@ -23,22 +22,22 @@ export function useCaptureBarActions() {
   const onSave = useCallback(async () => {
     try {
       await SaveLastScreenshot("");
-      toast("Screenshot saved", "success");
+      Notify("Screenshot saved", "Saved to your output folder").catch(() => {});
     } catch {
-      toast("Save failed", "error");
+      Notify("Save failed", "Could not save screenshot").catch(() => {});
     }
     dismiss();
-  }, [toast, dismiss]);
+  }, [dismiss]);
 
   const onCopy = useCallback(async () => {
     try {
       await CopyLastToClipboard();
-      toast("Copied to clipboard", "success");
+      Notify("Copied", "Screenshot copied to clipboard").catch(() => {});
     } catch {
-      toast("Copy failed", "error");
+      Notify("Copy failed", "Could not copy to clipboard").catch(() => {});
     }
     dismiss();
-  }, [toast, dismiss]);
+  }, [dismiss]);
 
   const onEdit = useCallback(async () => {
     await SetWindowAsMain().catch(() => {});

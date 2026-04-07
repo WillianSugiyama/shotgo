@@ -1,33 +1,36 @@
+import { useCallback } from "react";
 import { ArrowLeft, Pause, Play, Square } from "lucide-react";
 import { useRecording } from "../../hooks/useRecording";
 import { useAppStore } from "../../stores/appStore";
+import { useEscape } from "../../hooks/useEscape";
 import { SourcePicker } from "./SourcePicker";
 import { RecordingPreview } from "./RecordingPreview";
+import { RecBtn } from "./RecBtn";
 
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
+function fmt(s: number) {
+  return `${Math.floor(s / 60)
     .toString()
-    .padStart(2, "0");
-  const s = (seconds % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
+    .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
 export function RecorderControls() {
   const { state, elapsedSeconds, maxSeconds, start, stop, pause, resume } = useRecording();
   const { setView } = useAppStore();
   const isRec = state === "recording";
+  const goBack = useCallback(() => setView("idle"), [setView]);
+  useEscape(goBack, state === "idle" || state === "stopped");
 
   const backBtn = (
     <button
       title="Back"
       onClick={() => setView("idle")}
-      className="btn-ghost absolute top-4 left-4"
+      className="absolute top-[12px] left-[12px] text-[10px] font-mono uppercase tracking-[0.12em] text-white/50 hover:text-accent bg-transparent border-none cursor-pointer inline-flex items-center gap-[5px]"
     >
-      <ArrowLeft size={18} /> Back
+      <ArrowLeft size={12} /> Back
     </button>
   );
 
-  const wrap = "relative flex flex-col items-center justify-center h-full gap-6";
+  const wrap = "relative flex flex-col items-center justify-center h-full gap-[24px] bg-black";
 
   if (state === "idle") {
     return (
@@ -50,38 +53,35 @@ export function RecorderControls() {
   return (
     <div className={wrap}>
       {backBtn}
-      <div className={isRec ? "rounded-lg border-2 border-recording p-6 bg-recording/5" : "p-6"}>
-        <div className="flex items-center gap-2 justify-center">
+      <div
+        className={`border-2 p-[24px] min-w-[320px] ${isRec ? "border-accent" : "border-white/15"}`}
+      >
+        <div className="flex items-center gap-[12px] justify-center">
           {isRec && (
-            <span className="w-3 h-3 rounded-full bg-recording animate-[pulse-dot_1s_ease-in-out_infinite]" />
+            <span className="w-[10px] h-[10px] bg-accent animate-[pulse-dot_1s_ease-in-out_infinite]" />
           )}
-          <span className="font-mono text-5xl font-bold text-text tracking-wider">
-            {formatTime(elapsedSeconds)}
+          <span className="font-mono text-[56px] font-black text-white tracking-tight leading-none">
+            {fmt(elapsedSeconds)}
           </span>
-          <span className="text-text-muted text-base font-mono">/ {formatTime(maxSeconds)}</span>
+        </div>
+        <div className="mt-[14px] flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.12em] text-white/50">
+          <span>Elapsed</span>
+          <span>{fmt(maxSeconds)} max</span>
+        </div>
+        <div className="mt-[6px] h-[3px] w-full bg-white/10 relative overflow-hidden">
+          <div
+            className="absolute top-0 left-0 h-full bg-accent transition-all"
+            style={{ width: `${Math.min(100, (elapsedSeconds / maxSeconds) * 100)}%` }}
+          />
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        {isRec && (
-          <>
-            <button onClick={pause} className="btn-secondary">
-              <Pause size={16} /> Pause
-            </button>
-            <button onClick={stop} className="btn-danger">
-              <Square size={16} fill="white" /> Stop
-            </button>
-          </>
-        )}
-        {state === "paused" && (
-          <>
-            <button onClick={resume} className="btn-secondary">
-              <Play size={16} /> Resume
-            </button>
-            <button onClick={stop} className="btn-danger">
-              <Square size={16} fill="white" /> Stop
-            </button>
-          </>
-        )}
+      <div className="flex items-center gap-[8px]">
+        <RecBtn onClick={isRec ? pause : resume}>
+          {isRec ? <Pause size={13} /> : <Play size={13} />} {isRec ? "Pause" : "Resume"}
+        </RecBtn>
+        <RecBtn onClick={stop} primary>
+          <Square size={13} fill="currentColor" /> Stop
+        </RecBtn>
       </div>
     </div>
   );

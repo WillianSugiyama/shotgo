@@ -1,56 +1,64 @@
-import { Camera, Monitor, Crop, Video, Settings, ScrollText } from "lucide-react";
+import { Crop, Monitor, ScrollText, Video, Settings } from "lucide-react";
 import { useAppStore } from "../stores/appStore";
+import { useCaptureStore } from "../stores/captureStore";
 import { useCapture } from "../hooks/useCapture";
 import { useScrollCapture } from "../hooks/useScrollCapture";
+import { ShotGoLogo } from "./ShotGoLogo";
+import { HeroAction } from "./idle/HeroAction";
+import { ChipAction } from "./idle/ChipAction";
+import { CapturingOverlay } from "./idle/CapturingOverlay";
 
 export function IdleView() {
   const { setView } = useAppStore();
   const { captureFullscreen, captureRegion } = useCapture();
   const { startScrollCapture } = useScrollCapture();
+  const isCapturing = useCaptureStore((s) => s.isCapturing);
 
   return (
-    <div className="view-transition flex flex-col items-center justify-center h-full p-8 gap-6">
-      <div className="w-16 h-16 rounded-lg bg-accent-subtle flex items-center justify-center">
-        <Camera size={32} className="text-accent" />
+    <div className="view-transition view-pad relative flex flex-col items-center justify-center h-full gap-[28px] bg-black">
+      {isCapturing && <CapturingOverlay />}
+      <div className="flex items-center gap-[14px]">
+        <ShotGoLogo size={44} />
+        <span className="text-[24px] font-black text-white leading-none tracking-tight">
+          ShotGo
+        </span>
       </div>
-      <div className="text-center">
-        <h1 className="text-[22px] font-semibold text-text tracking-tight">ShotGo</h1>
-        <p className="text-[13px] text-text-muted mt-1">Screenshot & Recording</p>
+
+      <HeroAction
+        icon={<Crop size={22} />}
+        label="Capture Area"
+        sub="Drag to select a region"
+        shortcut={["⌘", "⇧", "4"]}
+        onClick={captureRegion}
+      />
+
+      <div className="flex items-stretch gap-[10px] w-full max-w-[380px]">
+        <ChipAction
+          icon={<Monitor size={16} />}
+          label="Fullscreen"
+          shortcut="⌘⇧3"
+          onClick={captureFullscreen}
+        />
+        <ChipAction
+          icon={<ScrollText size={16} />}
+          label="Long Page"
+          shortcut="⌘⇧5"
+          onClick={startScrollCapture}
+        />
+        <ChipAction
+          icon={<Video size={16} />}
+          label="Record"
+          shortcut="⌘⇧6"
+          onClick={() => setView("recorder")}
+        />
       </div>
-      <div className="flex gap-4 flex-wrap justify-center">
-        <BtnWrap label="Capture entire screen">
-          <button onClick={captureFullscreen} className="btn-primary">
-            <Monitor size={15} /> Fullscreen
-          </button>
-        </BtnWrap>
-        <BtnWrap label="Select an area">
-          <button onClick={captureRegion} className="btn-primary">
-            <Crop size={15} /> Region
-          </button>
-        </BtnWrap>
-        <BtnWrap label="Record your screen">
-          <button onClick={() => setView("recorder")} className="btn-primary">
-            <Video size={15} /> Record
-          </button>
-        </BtnWrap>
-        <BtnWrap label="Capture scrollable">
-          <button onClick={startScrollCapture} className="btn-primary">
-            <ScrollText size={15} /> Scroll
-          </button>
-        </BtnWrap>
-      </div>
-      <button onClick={() => setView("settings")} className="btn-secondary">
-        <Settings size={15} /> Settings
+
+      <button
+        onClick={() => setView("settings")}
+        className="inline-flex items-center gap-[6px] text-[10px] text-white/40 hover:text-[#6c5ce7] uppercase tracking-[0.1em] font-mono bg-transparent border-none cursor-pointer mt-[4px]"
+      >
+        <Settings size={11} /> Preferences
       </button>
-    </div>
-  );
-}
-
-function BtnWrap({ children, label }: { children: React.ReactNode; label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      {children}
-      <span className="text-[11px] text-text-muted">{label}</span>
     </div>
   );
 }

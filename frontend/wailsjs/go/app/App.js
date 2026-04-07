@@ -58,6 +58,10 @@ export function LoadConfig() {
   return window['go']['app']['App']['LoadConfig']();
 }
 
+export function Notify(arg1, arg2) {
+  return window['go']['app']['App']['Notify'](arg1, arg2);
+}
+
 export function OpenFile(arg1) {
   return window['go']['app']['App']['OpenFile'](arg1);
 }
@@ -120,4 +124,8 @@ export function StartRecording(arg1) {
 
 export function StopRecording() {
   return window['go']['app']['App']['StopRecording']();
+}
+
+export function UpdateLastScreenshot(arg1) {
+  return window['go']['app']['App']['UpdateLastScreenshot'](arg1);
 }

@@ -9,8 +9,8 @@ import (
 const (
 	barWidth   = 288
 	barHeight  = 208
-	mainWidth  = 800
-	mainHeight = 600
+	mainWidth  = 812
+	mainHeight = 612
 )
 
 // SetWindowAsBar resizes the window to a small capture bar at bottom-center.

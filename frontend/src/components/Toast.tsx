@@ -1,9 +1,9 @@
 import { useToastStore } from "../stores/toastStore";
 
-const borderColors = {
-  success: "border-l-success",
-  error: "border-l-danger",
-  info: "border-l-accent",
+const tagColors = {
+  success: { bg: "bg-accent", text: "text-black", label: "✓ SAVED" },
+  error: { bg: "bg-warning", text: "text-black", label: "✗ ERROR" },
+  info: { bg: "bg-white", text: "text-black", label: "▶ INFO" },
 };
 
 export function ToastContainer() {
@@ -11,16 +11,24 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[10000] flex flex-col gap-2">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          onClick={() => dismiss(t.id)}
-          className={`px-4 py-2 bg-surface border-l-[3px] ${borderColors[t.type]} rounded-sm text-text text-[13px] cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4)] animate-[fadeIn_0.2s_ease]`}
-        >
-          {t.message}
-        </div>
-      ))}
+    <div className="fixed bottom-[16px] right-[16px] z-[10000] flex flex-col gap-[8px]">
+      {toasts.map((t) => {
+        const c = tagColors[t.type];
+        return (
+          <div
+            key={t.id}
+            onClick={() => dismiss(t.id)}
+            className="bg-black border border-white/20 cursor-pointer animate-[slideUpSnap_0.25s_cubic-bezier(0.16,1,0.3,1)] flex items-stretch"
+          >
+            <div
+              className={`${c.bg} ${c.text} px-[8px] flex items-center text-[9px] font-mono font-bold uppercase tracking-[0.1em]`}
+            >
+              {c.label}
+            </div>
+            <div className="px-[12px] py-[8px] text-white text-[12px] font-mono">{t.message}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

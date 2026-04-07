@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { MoveUpRight, Type, Droplets, Crop, Undo2, Download, Copy, X } from "lucide-react";
+import { MoveUpRight, Type, Droplets, Crop, Undo2, Download, Copy, ArrowLeft } from "lucide-react";
 
 export type EditorTool = "arrow" | "text" | "blur" | "crop" | null;
 
@@ -23,7 +23,7 @@ export function Toolbar(props: Props) {
   const { activeTool, onSelectTool, onUndo, onSave, onCopy, onCancel } = props;
 
   return (
-    <div className="flex items-center gap-1 px-3 py-1.5 bg-surface border-b border-border shrink-0">
+    <div className="flex items-center gap-[2px] px-[12px] py-[8px] bg-black border-b border-white/15 shrink-0">
       {tools.map(({ id, label, key, Icon }) => (
         <ToolBtn
           key={id}
@@ -31,25 +31,26 @@ export function Toolbar(props: Props) {
           active={activeTool === id}
           onClick={() => onSelectTool(activeTool === id ? null : id)}
         >
-          <Icon size={16} />
+          <Icon size={15} />
         </ToolBtn>
       ))}
       <Sep />
       <ToolBtn title="Undo (Cmd+Z)" onClick={onUndo}>
-        <Undo2 size={16} />
+        <Undo2 size={15} />
       </ToolBtn>
       <div className="flex-1" />
       <ToolBtn title="Copy (Cmd+C)" onClick={onCopy}>
-        <Copy size={14} />
-        <span className="text-xs">Copy</span>
+        <Copy size={13} />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Copy</span>
       </ToolBtn>
       <ToolBtn title="Save (Cmd+S)" onClick={onSave} accent>
-        <Download size={14} />
-        <span className="text-xs">Save</span>
+        <Download size={13} />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Save</span>
       </ToolBtn>
       <Sep />
-      <ToolBtn title="Cancel (Esc)" onClick={onCancel} danger>
-        <X size={14} />
+      <ToolBtn title="Exit (Esc)" onClick={onCancel}>
+        <ArrowLeft size={13} />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Exit</span>
       </ToolBtn>
     </div>
   );
@@ -70,16 +71,15 @@ function ToolBtn({
   onClick: () => void;
   children: React.ReactNode;
 }) {
-  let cls = "text-text-muted hover:text-text hover:bg-surface-hover";
-  if (active) cls = "text-accent bg-accent-subtle";
-  if (accent) cls = "text-accent hover:bg-accent-subtle";
-  if (danger) cls = "text-danger hover:bg-danger-subtle";
-
+  let cls = "text-white/60 hover:text-white hover:bg-white/5";
+  if (active) cls = "text-black bg-accent";
+  if (accent) cls = "text-black bg-accent hover:bg-white";
+  if (danger) cls = "text-accent hover:bg-accent hover:text-black";
   return (
     <button
       title={title}
       onClick={onClick}
-      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded-md border-none cursor-pointer bg-transparent ${cls}`}
+      className={`inline-flex items-center gap-[5px] px-[10px] py-[6px] border-none cursor-pointer ${cls}`}
     >
       {children}
     </button>
@@ -87,5 +87,5 @@ function ToolBtn({
 }
 
 function Sep() {
-  return <div className="w-px h-5 bg-border mx-1" />;
+  return <div className="w-px h-[18px] bg-white/15 mx-[4px]" />;
 }

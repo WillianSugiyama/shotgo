@@ -1,72 +1,69 @@
-import { useRef, useEffect, useCallback, type MouseEvent } from "react";
-import { Annotation } from "../../hooks/useEditorTools";
-import { drawArrow, ArrowData } from "./tools/ArrowTool";
-import { drawText, TextData } from "./tools/TextTool";
-import { applyBlur, BlurData } from "./tools/BlurTool";
+import { type MouseEvent, type RefObject } from "react";
+import type {
+  Annotation,
+  DragState,
+  PendingText,
+  CropRect,
+} from "../../hooks/useEditorTools.types";
+import { useCanvasRender } from "../../hooks/useCanvasRender";
+import { TextInputOverlay } from "./TextInputOverlay";
+import { CropOverlay } from "./CropOverlay";
+import { DragPreview } from "./DragPreview";
 
 interface Props {
+  canvasRef: RefObject<HTMLCanvasElement | null>;
   imageData: string | null;
   annotations: Annotation[];
+  drag: DragState | null;
+  pendingText: PendingText | null;
+  cropRect: CropRect | null;
   onMouseDown: (x: number, y: number) => void;
+  onMouseMove: (x: number, y: number) => void;
   onMouseUp: (x: number, y: number) => void;
+  onCommitText: (text: string) => void;
+  onCancelText: () => void;
 }
 
-export function InteractiveCanvas({ imageData, annotations, onMouseDown, onMouseUp }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  useEffect(() => {
-    if (!imageData) return;
-    const img = new Image();
-    img.onload = () => {
-      imageRef.current = img;
-      redraw();
-    };
-    img.src = imageData;
-  }, [imageData]);
-
-  useEffect(() => {
-    redraw();
-  }, [annotations]);
-
-  const redraw = useCallback(() => {
-    const canvas = canvasRef.current;
-    const img = imageRef.current;
-    if (!canvas || !img) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-
-    for (const ann of annotations) {
-      if (ann.type === "blur") applyBlur(ctx, ann.data as BlurData);
-    }
-    for (const ann of annotations) {
-      if (ann.type === "arrow") drawArrow(ctx, ann.data as ArrowData);
-      if (ann.type === "text") drawText(ctx, ann.data as TextData);
-    }
-  }, [annotations]);
+export function InteractiveCanvas(props: Props) {
+  const { canvasRef, imageData, annotations, drag, pendingText, cropRect } = props;
+  const size = useCanvasRender(canvasRef, imageData, annotations);
 
   const getPos = (e: MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const scaleX = (canvasRef.current?.width ?? 0) / rect.width;
+    const scaleY = (canvasRef.current?.height ?? 0) / rect.height;
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="block mx-auto cursor-crosshair"
-      onMouseDown={(e) => {
-        const p = getPos(e);
-        onMouseDown(p.x, p.y);
-      }}
-      onMouseUp={(e) => {
-        const p = getPos(e);
-        onMouseUp(p.x, p.y);
-      }}
-    />
+    <div className="relative inline-block">
+      <canvas
+        ref={canvasRef as RefObject<HTMLCanvasElement>}
+        className="block cursor-crosshair"
+        onMouseDown={(e) => {
+          const p = getPos(e);
+          props.onMouseDown(p.x, p.y);
+        }}
+        onMouseMove={(e) => {
+          const p = getPos(e);
+          props.onMouseMove(p.x, p.y);
+        }}
+        onMouseUp={(e) => {
+          const p = getPos(e);
+          props.onMouseUp(p.x, p.y);
+        }}
+      />
+      {drag && <DragPreview drag={drag} canvasSize={size} />}
+      {pendingText && (
+        <TextInputOverlay
+          pos={pendingText}
+          canvasSize={size}
+          onCommit={props.onCommitText}
+          onCancel={props.onCancelText}
+        />
+      )}
+      {cropRect && <CropOverlay rect={cropRect} canvasSize={size} />}
+    </div>
   );
 }
